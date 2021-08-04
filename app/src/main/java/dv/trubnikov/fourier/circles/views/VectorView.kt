@@ -70,7 +70,8 @@ class VectorView @JvmOverloads constructor(
         drawAxis(canvas)
         animation?.let {
             drawVectors(canvas, vectors, it.time)
-            if (it.isAnimating) invalidate()
+            if (!it.isAnimating) it.reset()
+            invalidate()
         }
     }
 
@@ -134,13 +135,18 @@ class VectorView @JvmOverloads constructor(
 
     private class Animation(private val slowFactor: Int = 10) {
 
-        private val startTime = System.currentTimeMillis()
-        private val endTime = startTime + 1 * 1000 * slowFactor
+        private var startTime = System.currentTimeMillis()
+        private var endTime = startTime + 1 * 1000 * slowFactor
 
         val isAnimating: Boolean
             get() = System.currentTimeMillis() < endTime
 
         val time: Float
             get() = (System.currentTimeMillis() - startTime).toFloat() / 1000 / slowFactor
+
+        fun reset() {
+            startTime = System.currentTimeMillis()
+            endTime = startTime + 1 * 1000 * slowFactor
+        }
     }
 }
