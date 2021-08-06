@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
-import android.view.View
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withTranslation
 import dv.trubnikov.fourier.circles.R
@@ -22,14 +21,11 @@ class VectorView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-) : View(context, attrs, defStyleAttr, defStyleRes) {
+) : AxisView(context, attrs, defStyleAttr, defStyleRes) {
 
     companion object {
         private val MIN_ARROW_WIDTH = 30f
 
-        private val AXIS_PAINT = Paint().apply {
-            color = Color.GRAY
-        }
         private val VECTOR_PAINT = Paint().apply {
             color = Color.YELLOW
             strokeWidth = 3f
@@ -67,19 +63,12 @@ class VectorView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        drawAxis(canvas)
+        super.onDraw(canvas)
         animation?.let {
             drawVectors(canvas, vectors, it.time)
             if (!it.isAnimating) it.reset()
             invalidate()
         }
-    }
-
-    private fun drawAxis(canvas: Canvas) {
-        // Real axis
-        canvas.drawLine(width / 2f, 0f, width / 2f, height.toFloat(), AXIS_PAINT)
-        // Image axis
-        canvas.drawLine(0f, height / 2f, width.toFloat(), height / 2f, AXIS_PAINT)
     }
 
     private fun drawVectors(canvas: Canvas, vectors: List<FourierCoefficient>, time: Float) {

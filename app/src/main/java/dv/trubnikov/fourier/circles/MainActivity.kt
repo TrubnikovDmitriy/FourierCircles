@@ -1,14 +1,18 @@
 package dv.trubnikov.fourier.circles
 
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.ComponentActivity
+import androidx.core.view.isVisible
 import dv.trubnikov.fourier.circles.calculates.FourierCalculator
 import dv.trubnikov.fourier.circles.calculates.PI_2
 import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.FourierCoefficient
+import dv.trubnikov.fourier.circles.views.DrawView
 import dv.trubnikov.fourier.circles.views.VectorView
 import kotlin.math.cos
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 class MainActivity : ComponentActivity() {
@@ -78,15 +82,23 @@ class MainActivity : ComponentActivity() {
     }
 
     private val vectorView by lazy { findViewById<VectorView>(R.id.vector_view) }
+    private val drawView by lazy { findViewById<DrawView>(R.id.draw_view) }
+    private val restart by lazy { findViewById<Button>(R.id.restart_button) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+        setUpButtons()
     }
 
-    override fun onStart() {
-        super.onStart()
-        val fourierCalculator = FourierCalculator(TEST)
+    private fun calculateFourier(data: List<Complex>, duration: Long) {
+        if (data.isEmpty()) {
+            return
+        }
+        val fourierCalculator = FourierCalculator { time ->
+            val index = (data.lastIndex * time).roundToInt()
+            data[index]
+        }
         val termsCount = 200
         val terms = fourierCalculator.calculateCoefficient(termsCount)
         val coefficients = ArrayList<FourierCoefficient>(terms.size)
@@ -99,5 +111,21 @@ class MainActivity : ComponentActivity() {
             }
         }
         vectorView.setVectors(coefficients)
+        changeView(drawing = false)
+    }
+
+    private fun setUpButtons() {
+        drawView.setOnDrawFinishListener { data, duration ->
+            calculateFourier(data, duration)
+        }
+        restart.setOnClickListener {
+            changeView(drawing = true)
+        }
+    }
+
+    private fun changeView(drawing: Boolean) {
+        vectorView.isVisible = !drawing
+        restart.isVisible = !drawing
+        drawView.isVisible = drawing
     }
 }
