@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
             val index = (data.lastIndex * time).roundToInt()
             data[index]
         }
-        val termsCount = 200
+        val termsCount = 3
         val terms = fourierCalculator.calculateCoefficient(termsCount)
         val coefficients = ArrayList<FourierCoefficient>(terms.size)
         for (i in 0..termsCount) {

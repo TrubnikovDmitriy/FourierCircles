@@ -73,6 +73,7 @@ class VectorView @JvmOverloads constructor(
 
     private fun drawVectors(canvas: Canvas, vectors: List<FourierCoefficient>, time: Float) {
         var sourcePoint = Complex(width / 2f, height / 2f)
+        canvas.drawPath(vectorTrace, VECTOR_TRACE_PAINT)
         for (vector in vectors) {
             val (x0, y0) = sourcePoint
             sourcePoint += vector.toComplex(time)
@@ -80,8 +81,7 @@ class VectorView @JvmOverloads constructor(
             // In android Oy is inverted
             drawVector(canvas, x0, height - y0, x1, height - y1)
         }
-
-        drawTrace(canvas, vectorTrace, sourcePoint)
+        addTracePoint(vectorTrace, sourcePoint)
     }
 
     private fun drawVector(canvas: Canvas, x0: Float, y0: Float, x1: Float, y1: Float) {
@@ -89,9 +89,9 @@ class VectorView @JvmOverloads constructor(
         val angle = atan2(y1 - y0, x1 - x0)
         canvas.withTranslation(x0, y0) {
             canvas.withRotation(angle.toDegree()) {
+                drawCircle(canvas, length)
                 canvas.drawLine(0f, 0f, length, 0f, VECTOR_PAINT)
                 drawArrow(canvas, length)
-                drawCircle(canvas, length)
             }
         }
     }
@@ -111,7 +111,7 @@ class VectorView @JvmOverloads constructor(
         canvas.drawCircle(0f, 0f, radius, ARROW_CIRCLE_PAINT)
     }
 
-    private fun drawTrace(canvas: Canvas, path: Path, nextPoint: Complex) {
+    private fun addTracePoint(path: Path, nextPoint: Complex) {
         if (path.isEmpty) {
             val (startX, startY) = nextPoint
             path.moveTo(startX, height - startY)
@@ -119,10 +119,9 @@ class VectorView @JvmOverloads constructor(
             val (nextX, nextY) = nextPoint
             path.lineTo(nextX, height - nextY)
         }
-        canvas.drawPath(path, VECTOR_TRACE_PAINT)
     }
 
-    private class Animation(private val slowFactor: Int = 10) {
+    private class Animation(private val slowFactor: Int = 20) {
 
         private var startTime = System.currentTimeMillis()
         private var endTime = startTime + 1 * 1000 * slowFactor
