@@ -1,20 +1,16 @@
 package dv.trubnikov.fourier.circles.views
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import android.util.AttributeSet
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withTranslation
+import dv.trubnikov.fourier.circles.PictureController
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.Complex
-import dv.trubnikov.fourier.circles.models.FourierCoefficient
 import dv.trubnikov.fourier.circles.models.plus
 import dv.trubnikov.fourier.circles.models.toDegree
 import kotlin.math.*
-
 
 class VectorView @JvmOverloads constructor(
     context: Context,
@@ -25,63 +21,71 @@ class VectorView @JvmOverloads constructor(
 
     companion object {
         private val MIN_ARROW_WIDTH = 30f
+    }
 
-        private val VECTOR_PAINT = Paint().apply {
-            color = Color.YELLOW
-            strokeWidth = 3f
-        }
-        private val VECTOR_TRACE_PAINT = Paint().apply {
-            color = Color.RED
-            isAntiAlias = true
-            strokeWidth = 5f
-            style = Paint.Style.STROKE
-        }
-        private val ARROW_CIRCLE_PAINT = Paint().apply {
-            color = Color.GRAY
-            isAntiAlias = true
-            strokeWidth = 1f
-            style = Paint.Style.STROKE
-        }
+    private val VECTOR_PAINT = Paint().apply {
+        color = Color.YELLOW
+        strokeWidth = 3f
+    }
+    private val USER_PATH_PAINT = Paint().apply {
+        color = context.getColor(R.color.vector_color)
+        isAntiAlias = true
+        strokeWidth = 3f
+        style = Paint.Style.STROKE
+        pathEffect = DashPathEffect(floatArrayOf(10f, 20f), 0f)
+    }
+    private val FOURIER_PATH_PAINT = Paint().apply {
+        color = Color.RED
+        isAntiAlias = true
+        strokeWidth = 5f
+        style = Paint.Style.STROKE
+    }
+    private val ARROW_CIRCLE_PAINT = Paint().apply {
+        color = Color.GRAY
+        isAntiAlias = true
+        strokeWidth = 1f
+        style = Paint.Style.STROKE
     }
 
     init {
         setBackgroundColor(context.getColor(R.color.vector_background_color))
     }
 
-    private var vectors = emptyList<FourierCoefficient>()
-    private var animation: Animation? = null
-    private val vectorTrace = Path()
+    private var lastState: PictureController.VectorPicture? = null
+
+    private val originalPath = Path()
     private val arrowPath = Path()
 
-    fun setVectors(vectors: List<FourierCoefficient>) {
-        post {
-            animation = Animation()
-            this.vectors = vectors
-            vectorTrace.rewind()
-            invalidate()
-        }
+    fun drawVectorPicture(picture: PictureController.VectorPicture) {
+        lastState = picture
+        postInvalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
+        // TODO: Строить точки не на мейн потоке, а в фоне перед вызовом postInvalidate()
         super.onDraw(canvas)
-        animation?.let {
-            drawVectors(canvas, vectors, it.time)
-            if (!it.isAnimating) it.reset()
-            invalidate()
+        val picture = lastState ?: return
+
+        drawFourierPath(canvas, picture.drawingPath)
+
+        originalPath.let { path ->
+            picture.originalPath.toPath(path)
+            path.close()
+            canvas.drawPath(path, USER_PATH_PAINT)
         }
+
+        drawVectors(canvas, picture.vectors)
     }
 
-    private fun drawVectors(canvas: Canvas, vectors: List<FourierCoefficient>, time: Float) {
+    private fun drawVectors(canvas: Canvas, vectors: List<Complex>) {
         var sourcePoint = Complex(width / 2f, height / 2f)
-        canvas.drawPath(vectorTrace, VECTOR_TRACE_PAINT)
         for (vector in vectors) {
             val (x0, y0) = sourcePoint
-            sourcePoint += vector.toComplex(time)
+            sourcePoint += vector
             val (x1, y1) = sourcePoint
             // In android Oy is inverted
             drawVector(canvas, x0, height - y0, x1, height - y1)
         }
-        addTracePoint(vectorTrace, sourcePoint)
     }
 
     private fun drawVector(canvas: Canvas, x0: Float, y0: Float, x1: Float, y1: Float) {
@@ -111,30 +115,38 @@ class VectorView @JvmOverloads constructor(
         canvas.drawCircle(0f, 0f, radius, ARROW_CIRCLE_PAINT)
     }
 
-    private fun addTracePoint(path: Path, nextPoint: Complex) {
-        if (path.isEmpty) {
-            val (startX, startY) = nextPoint
-            path.moveTo(startX, height - startY)
-        } else {
-            val (nextX, nextY) = nextPoint
-            path.lineTo(nextX, height - nextY)
+    private fun drawFourierPath(canvas: Canvas, points: List<Complex>) {
+        if (points.size < 2) {
+            return
+        }
+        var prevPoint = points.first().toViewCoordinates()
+        for (i in 1..points.lastIndex) {
+            val alpha = 255 * i / points.lastIndex
+            FOURIER_PATH_PAINT.alpha = alpha.coerceIn(150, 255)
+            val (x0, y0) = prevPoint
+            prevPoint = points[i].toViewCoordinates()
+            val (x1, y1) = prevPoint
+            canvas.drawLine(x0, y0, x1, y1, FOURIER_PATH_PAINT)
         }
     }
 
-    private class Animation(private val slowFactor: Int = 20) {
-
-        private var startTime = System.currentTimeMillis()
-        private var endTime = startTime + 1 * 1000 * slowFactor
-
-        val isAnimating: Boolean
-            get() = System.currentTimeMillis() < endTime
-
-        val time: Float
-            get() = (System.currentTimeMillis() - startTime).toFloat() / 1000 / slowFactor
-
-        fun reset() {
-            startTime = System.currentTimeMillis()
-            endTime = startTime + 1 * 1000 * slowFactor
+    private fun List<Complex>.toPath(path: Path) {
+        path.rewind()
+        val halfScreenX = width / 2
+        val halfScreenY = height / 2
+        for (index in this.indices) {
+            val point = get(index)
+            val x = halfScreenX + point.real
+            val y = halfScreenY - point.image
+            if (index == 0) {
+                path.moveTo(x, y)
+            } else {
+                path.lineTo(x, y)
+            }
         }
+    }
+
+    private fun Complex.toViewCoordinates(): Complex {
+        return Complex(real = width / 2 + real, image = height / 2 - image)
     }
 }

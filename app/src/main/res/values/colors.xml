@@ -10,4 +10,5 @@
 
     <!-- Vector Activity-->
     <color name="vector_background_color">#FF000000</color>
+    <color name="vector_color">#FFFFFF00</color>
 </resources>
