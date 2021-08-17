@@ -31,22 +31,25 @@ class PictureCalculator(
         fun valueAt(time: Tick): PicturePoint
     }
 
-    suspend fun calculatePicture(vectorsCount: Int): Picture {
-        return withContext(Dispatchers.IO) {
-            val n = (vectorsCount - 1) / 2
-            val coefs = fourierCalculator.calculateCoefficient(n).sorted()
-            val picturePointCount = (1f / TIME_RANGE_STEP).toInt()
-            val picturePoints = ArrayList<Deferred<PicturePoint>>()
-            for (pointNumber in 0..picturePointCount) {
-                val time = Tick(TIME_RANGE_STEP * pointNumber)
-                val point = async(Dispatchers.IO) {
-                    calculatePoint(coefs, time)
-                }
-                picturePoints.add(point)
+    /**
+     * Calculates the whole picture using Fourier series
+     * with a given number of terms [vectorNumber].
+     */
+    suspend fun calculatePicture(vectorNumber: Int): Picture = coroutineScope {
+        val n = (vectorNumber - 1) / 2
+        val coefs = fourierCalculator.calculateCoefficient(n).sorted()
+        val picturePointCount = (1f / TIME_RANGE_STEP).toInt()
+        val picturePoints = ArrayList<Deferred<PicturePoint>>()
+        for (pointNumber in 0..picturePointCount) {
+            val time = Tick(TIME_RANGE_STEP * pointNumber)
+            val point = async(Dispatchers.IO) {
+                calculatePoint(coefs, time)
             }
-            PictureWithoutInterpolation(picturePoints.awaitAll())
+            picturePoints.add(point)
         }
+        PictureWithoutInterpolation(picturePoints.awaitAll())
     }
+
 
     private fun calculatePoint(coefficients: List<FourierCoefficient>, time: Tick): PicturePoint {
         var sumVector = Complex(0f, 0f)

@@ -1,6 +1,5 @@
 package dv.trubnikov.fourier.circles
 
-import androidx.annotation.IntRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dv.trubnikov.fourier.circles.PictureController.VectorPicture
@@ -10,6 +9,8 @@ import dv.trubnikov.fourier.circles.models.Complex
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlin.math.log
+import kotlin.math.pow
 import kotlin.math.roundToInt
 
 class VectorViewModel : ViewModel() {
@@ -26,7 +27,7 @@ class VectorViewModel : ViewModel() {
     private val pictureController = PictureController(viewModelScope, timeController)
 
     val pictureFlow: SharedFlow<VectorPicture> = pictureController.pictureFlow
-    val vectorNumberFlow = MutableStateFlow(5)
+    val vectorsNumberFlow = MutableStateFlow(5)
 
     suspend fun setUserPicture(userPath: List<Complex>) {
         if (userPath.isEmpty()) {
@@ -39,7 +40,7 @@ class VectorViewModel : ViewModel() {
                 userPath[index]
             }
             val pictureCalculator = PictureCalculator(fourierCalculator)
-            val picture = pictureCalculator.calculatePicture(coefficientCount)
+            val picture = pictureCalculator.calculatePicture(vectorsNumberFlow.value)
             timeController.restart()
             pictureController.setPicture(userPath, picture)
 
@@ -49,12 +50,28 @@ class VectorViewModel : ViewModel() {
         }
     }
 
-    suspend fun changeNumberOfVectors(@IntRange(from = 1, to = 10_001) number: Int) {
-        val vectorsNumber = number.coerceIn(1, 10_000)
-        val pictureCalculator = pictureCalculator ?: return
+    suspend fun changeNumberOfVectors(number: Int) {
         val userPicture = userPicture ?: return
-        val fourierPicture = pictureCalculator.calculatePicture(vectorsNumber)
-        pictureController.setPicture(userPicture, fourierPicture)
-        vectorNumberFlow.value = vectorsNumber
+        val pictureCalculator = pictureCalculator ?: return
+        withContext(Dispatchers.Default) {
+            // Converting the linear scale of seekbar to logarithmic
+            // b = k * lg(a)
+            // a = 10^(b / k)
+            // k = b_max / lg(a_max)
+            val logarithmBase = 10.0
+            val maxCoefNumber = 100
+            val maxSeekbarNumber = 100
+            val k = maxSeekbarNumber / log(maxCoefNumber.toDouble(), logarithmBase)
+            val coefNumber = logarithmBase.pow(number / k).toInt()
+            val vectorsNumber = coefNumber.coerceIn(1, maxCoefNumber) * 2 + 1
+
+            if (vectorsNumber == vectorsNumberFlow.value) {
+                return@withContext
+            }
+
+            val fourierPicture = pictureCalculator.calculatePicture(vectorsNumber)
+            pictureController.setPicture(userPicture, fourierPicture)
+            vectorsNumberFlow.value = vectorsNumber
+        }
     }
 }

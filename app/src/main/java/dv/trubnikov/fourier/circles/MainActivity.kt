@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         lifecycleScope.launchWhenResumed {
-            viewModel.vectorNumberFlow.collect {
+            viewModel.vectorsNumberFlow.collect {
                 vectorCountText.text = it.toString()
             }
         }
