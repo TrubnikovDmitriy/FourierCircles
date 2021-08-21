@@ -11,7 +11,7 @@ android {
         applicationId "dv.trubnikov.fourier.circles"
         minSdk 23
         targetSdk 30
-        versionCode 1
+        versionCode 3
         versionName "1.0"
 
         vectorDrawables {
@@ -21,8 +21,11 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+        }
+        debug {
+            debuggable true
+            applicationIdSuffix ".debug"
         }
     }
     compileOptions {
