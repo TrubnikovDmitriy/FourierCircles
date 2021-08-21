@@ -8,7 +8,6 @@ import androidx.core.graphics.withTranslation
 import dv.trubnikov.fourier.circles.PictureController
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.Complex
-import dv.trubnikov.fourier.circles.models.plus
 import dv.trubnikov.fourier.circles.models.toDegree
 import kotlin.math.*
 
@@ -78,13 +77,16 @@ class VectorView @JvmOverloads constructor(
     }
 
     private fun drawVectors(canvas: Canvas, vectors: List<Complex>) {
-        var sourcePoint = Complex(width / 2f, height / 2f)
+        var x = width / 2f
+        var y = height / 2f
+        var x0: Float
+        var y0: Float
         for (vector in vectors) {
-            val (x0, y0) = sourcePoint
-            sourcePoint += vector
-            val (x1, y1) = sourcePoint
-            // In android Oy is inverted
-            drawVector(canvas, x0, height - y0, x1, height - y1)
+            x0 = x
+            y0 = y
+            x += vector.real
+            y += vector.image
+            drawVector(canvas, x0, height - y0, x, height - y)
         }
     }
 
@@ -119,13 +121,17 @@ class VectorView @JvmOverloads constructor(
         if (points.size < 2) {
             return
         }
-        var prevPoint = points.first().toViewCoordinates()
+        var x1 = width / 2 + points.first().real
+        var y1 = height / 2 - points.first().image
+        var x0: Float
+        var y0: Float
         for (i in 1..points.lastIndex) {
             val alpha = 255 * i / points.lastIndex
             FOURIER_PATH_PAINT.alpha = alpha.coerceIn(150, 255)
-            val (x0, y0) = prevPoint
-            prevPoint = points[i].toViewCoordinates()
-            val (x1, y1) = prevPoint
+            x0 = x1
+            y0 = y1
+            x1 = width / 2 + points[i].real
+            y1 = height / 2 - points[i].image
             canvas.drawLine(x0, y0, x1, y1, FOURIER_PATH_PAINT)
         }
     }
@@ -144,9 +150,5 @@ class VectorView @JvmOverloads constructor(
                 path.lineTo(x, y)
             }
         }
-    }
-
-    private fun Complex.toViewCoordinates(): Complex {
-        return Complex(real = width / 2 + real, image = height / 2 - image)
     }
 }

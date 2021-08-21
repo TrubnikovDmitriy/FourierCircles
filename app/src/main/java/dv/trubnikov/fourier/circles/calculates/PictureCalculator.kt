@@ -42,7 +42,7 @@ class PictureCalculator(
         val picturePoints = ArrayList<Deferred<PicturePoint>>()
         for (pointNumber in 0..picturePointCount) {
             val time = Tick(TIME_RANGE_STEP * pointNumber)
-            val point = async(Dispatchers.IO) {
+            val point = async(Dispatchers.Default) {
                 calculatePoint(coefs, time)
             }
             picturePoints.add(point)

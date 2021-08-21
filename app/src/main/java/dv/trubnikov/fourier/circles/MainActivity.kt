@@ -47,11 +47,11 @@ class MainActivity : ComponentActivity() {
         }
         vectorSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (!fromUser) return
-                lifecycleScope.launchWhenStarted {
-                    viewModel.changeNumberOfVectors(progress)
+                if (fromUser) {
+                    viewModel.onVectorCountChanged(progress)
                 }
             }
+
             override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
             override fun onStopTrackingTouch(seekBar: SeekBar) = Unit
         })
