@@ -9,8 +9,6 @@ import dv.trubnikov.fourier.circles.models.Complex
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
-import kotlin.math.log
-import kotlin.math.pow
 import kotlin.math.roundToInt
 
 class VectorViewModel : ViewModel() {
@@ -69,21 +67,7 @@ class VectorViewModel : ViewModel() {
         val userPicture = userPicture ?: return
         val pictureCalculator = pictureCalculator ?: return
         withContext(Dispatchers.Default) {
-            // Converting the linear scale of seekbar to logarithmic
-            // b = k * lg(a)
-            // a = 10^(b / k)
-            // k = b_max / lg(a_max)
-            val logarithmBase = 10.0
-            val maxCoefNumber = 100
-            val maxSeekbarNumber = 100
-            val k = maxSeekbarNumber / log(maxCoefNumber.toDouble(), logarithmBase)
-            val coefNumber = logarithmBase.pow(number / k).toInt()
-            val vectorsNumber = coefNumber.coerceIn(1, maxCoefNumber) * 2 + 1
-
-            if (vectorsNumber == vectorsNumberFlow.value) {
-                return@withContext
-            }
-
+            val vectorsNumber = (number * 1.5f).roundToInt() + 1
             val fourierPicture = pictureCalculator.calculatePicture(vectorsNumber)
             pictureController.setPicture(userPicture, fourierPicture)
             vectorsNumberFlow.value = vectorsNumber

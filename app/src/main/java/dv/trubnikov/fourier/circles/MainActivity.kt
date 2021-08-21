@@ -69,6 +69,7 @@ class MainActivity : ComponentActivity() {
                 vectorCountText.text = it.toString()
             }
         }
+        vectorSeekBar.progress = viewModel.vectorsNumberFlow.value
     }
 
     private fun changeView(drawing: Boolean) {
