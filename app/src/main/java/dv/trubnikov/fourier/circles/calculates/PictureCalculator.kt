@@ -37,7 +37,7 @@ class PictureCalculator(
      */
     suspend fun calculatePicture(vectorNumber: Int): Picture = coroutineScope {
         val n = (vectorNumber - 1) / 2
-        val coefs = fourierCalculator.calculateCoefficient(n).sorted()
+        val coefs = fourierCalculator.calculateCoefficients(n).sorted()
         val picturePointCount = (1f / TIME_RANGE_STEP).toInt()
         val picturePoints = ArrayList<Deferred<PicturePoint>>()
         for (pointNumber in 0..picturePointCount) {
