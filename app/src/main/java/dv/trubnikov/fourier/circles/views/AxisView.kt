@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.CallSuper
-import dv.trubnikov.fourier.circles.R
 
 abstract class AxisView @JvmOverloads constructor(
     context: Context,
