@@ -1,14 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <dv.trubnikov.fourier.circles.views.VectorView
-        android:id="@+id/vector_view"
+    <FrameLayout
+        android:id="@+id/vector_view_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@color/vector_background_color">
 
-    <include layout="@layout/layout_bottom_sheet" />
+        <dv.trubnikov.fourier.circles.views.VectorView
+            android:id="@+id/vector_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/sidebar_recycler_right"
+        android:layout_width="@dimen/sidebar_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:background="@drawable/bg_sidebar_right"
+        tools:ignore="RtlHardcoded" />
+
+    <FrameLayout
+        android:id="@+id/sidebar_recycler_left"
+        android:layout_width="@dimen/sidebar_width"
+        android:layout_height="match_parent"
+        android:layout_gravity="left"
+        android:background="@drawable/bg_sidebar_left"
+        tools:ignore="RtlHardcoded" />
+
+    <include
+        android:id="@+id/bottom_sheet"
+        layout="@layout/layout_bottom_sheet" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

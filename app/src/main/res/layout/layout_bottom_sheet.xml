@@ -3,29 +3,30 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:behavior_hideable="false"
-    app:behavior_peekHeight="@dimen/bg_corner_radius"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet"
     android:orientation="vertical"
     android:paddingTop="@dimen/bg_corner_radius"
-    android:background="@drawable/bg_bottom_sheet">
+    android:paddingBottom="16dp"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="@dimen/bg_corner_radius"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <TextView
         android:id="@+id/vector_count_text"
-        android:layout_width="72dp"
+        android:layout_width="48dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:ellipsize="marquee"
+        android:gravity="end"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxLines="1"
         android:textColor="@color/vector_color"
         android:textSize="20sp"
-        android:maxLines="1"
-        android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:paddingHorizontal="16dp"
         app:layout_constraintBottom_toBottomOf="@id/vector_count_seekbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/vector_count_seekbar"
+        tools:ignore="RtlSymmetry"
         tools:text="142" />
 
     <androidx.appcompat.widget.AppCompatSeekBar
@@ -33,13 +34,11 @@
         android:layout_width="0dp"
         android:layout_height="40dp"
         android:max="100"
-        android:progress="42"
         android:progressBackgroundTint="@color/vector_color"
         android:progressTint="@color/vector_color"
         android:thumbTint="@color/vector_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/vector_count_text" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
