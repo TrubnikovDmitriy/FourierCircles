@@ -67,6 +67,15 @@ class VectorActivity : ComponentActivity() {
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             finish()
         }
+        binding.bottomSheet.root.setOnClickListener {
+            val behaviour = BottomSheetBehavior.from(it)
+            val desiredState = when (behaviour.state) {
+                BottomSheetBehavior.STATE_COLLAPSED -> BottomSheetBehavior.STATE_EXPANDED
+                BottomSheetBehavior.STATE_EXPANDED -> BottomSheetBehavior.STATE_COLLAPSED
+                else -> return@setOnClickListener
+            }
+            behaviour.state = desiredState
+        }
     }
 
     private fun setupCollects() {
