@@ -5,7 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withTranslation
-import dv.trubnikov.fourier.circles.PictureController
+import dv.trubnikov.fourier.circles.presentation.vector.controllers.PictureController
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.toDegree

@@ -1,11 +1,13 @@
-package dv.trubnikov.fourier.circles
+package dv.trubnikov.fourier.circles.presentation.vector
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dv.trubnikov.fourier.circles.PictureController.VectorPicture
 import dv.trubnikov.fourier.circles.calculates.FourierCalculator
 import dv.trubnikov.fourier.circles.calculates.PictureCalculator
 import dv.trubnikov.fourier.circles.models.Complex
+import dv.trubnikov.fourier.circles.presentation.vector.controllers.PictureController
+import dv.trubnikov.fourier.circles.presentation.vector.controllers.PictureController.VectorPicture
+import dv.trubnikov.fourier.circles.presentation.vector.controllers.TimeController
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
@@ -67,7 +69,7 @@ class VectorViewModel : ViewModel() {
         val userPicture = userPicture ?: return
         val pictureCalculator = pictureCalculator ?: return
         withContext(Dispatchers.Default) {
-            val vectorsNumber = (number * 1.5f).roundToInt() + 1
+            val vectorsNumber = (number * 1.5f).roundToInt() / 2 * 2 + 1
             val fourierPicture = pictureCalculator.calculatePicture(vectorsNumber)
             pictureController.setPicture(userPicture, fourierPicture)
             vectorsNumberFlow.value = vectorsNumber

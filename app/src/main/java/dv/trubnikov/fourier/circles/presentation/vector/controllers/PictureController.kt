@@ -1,4 +1,4 @@
-package dv.trubnikov.fourier.circles
+package dv.trubnikov.fourier.circles.presentation.vector.controllers
 
 import dv.trubnikov.fourier.circles.calculates.PictureCalculator.Picture
 import dv.trubnikov.fourier.circles.calculates.Tick

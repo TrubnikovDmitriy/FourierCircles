@@ -1,4 +1,4 @@
-package dv.trubnikov.fourier.circles
+package dv.trubnikov.fourier.circles.presentation.vector.controllers
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

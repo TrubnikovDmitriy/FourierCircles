@@ -7,18 +7,24 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.FourierCircles">
+        android:theme="@style/Theme.FourierCircles.NoActionBar">
+
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.draw.DrawActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.FourierCircles.NoActionBar">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".presentation.vector.VectorActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+        </activity>
+
     </application>
 
 </manifest>
