@@ -10,10 +10,12 @@ import androidx.activity.viewModels
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.databinding.ActivityVectorBinding
 import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.getComplex
 import dv.trubnikov.fourier.circles.models.putComplex
+import dv.trubnikov.fourier.circles.presentation.draw.DrawActivity
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -59,6 +61,12 @@ class VectorActivity : ComponentActivity() {
                 }
             }
         )
+        binding.deleteButton.setOnClickListener {
+            val drawIntent = DrawActivity.getIntent(this)
+            startActivity(drawIntent)
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            finish()
+        }
     }
 
     private fun setupCollects() {
@@ -102,6 +110,10 @@ class VectorActivity : ComponentActivity() {
             }
             binding.sidebarRecyclerRight.apply {
                 translationX = +width * (1f - slideOffset)
+            }
+            binding.deleteButton.apply {
+                translationX = -width * slideOffset
+                alpha = 1f - slideOffset
             }
             // TODO: Instead of using container-view, start respecting padding in custom VectorView
             binding.vectorViewContainer.updatePadding(
