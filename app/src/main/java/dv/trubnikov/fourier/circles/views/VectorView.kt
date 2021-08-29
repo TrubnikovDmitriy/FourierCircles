@@ -5,10 +5,10 @@ import android.graphics.*
 import android.util.AttributeSet
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withTranslation
-import dv.trubnikov.fourier.circles.presentation.vector.controllers.PictureController
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.toDegree
+import dv.trubnikov.fourier.circles.presentation.vector.controllers.PictureController
 import kotlin.math.*
 
 class VectorView @JvmOverloads constructor(
@@ -24,6 +24,7 @@ class VectorView @JvmOverloads constructor(
 
     private val VECTOR_PAINT = Paint().apply {
         color = Color.YELLOW
+        isAntiAlias = true
         strokeWidth = 3f
     }
     private val USER_PATH_PAINT = Paint().apply {
