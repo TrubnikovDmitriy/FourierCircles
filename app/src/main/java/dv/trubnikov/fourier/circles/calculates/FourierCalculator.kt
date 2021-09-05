@@ -35,6 +35,6 @@ class FourierCalculator(
             val exp2 = userFunction(t).toExponent()
             (exp1 * exp2).toComplex()
         }.toExponent()
-        return FourierCoefficient(cn.amplitude, cn.beta, n)
+        return FourierCoefficient(number = n, amplitude = cn.amplitude, startAngle = cn.beta)
     }
 }

@@ -1,9 +1,6 @@
 package dv.trubnikov.fourier.circles.calculates
 
-import dv.trubnikov.fourier.circles.calculates.PictureCalculator.Picture.PicturePoint
-import dv.trubnikov.fourier.circles.models.Complex
-import dv.trubnikov.fourier.circles.models.FourierCoefficient
-import dv.trubnikov.fourier.circles.models.plus
+import dv.trubnikov.fourier.circles.models.*
 import kotlinx.coroutines.*
 
 class PictureCalculator(
@@ -15,84 +12,41 @@ class PictureCalculator(
     }
 
     /**
-     * Object containing precalculated cached values of the picture.
-     */
-    fun interface Picture {
-
-        class PicturePoint(
-            val time: Tick,
-            val point: Complex,
-            val vectors: List<Complex>,
-        )
-
-        /**
-         * Returns the point of picture at the specified [time].
-         */
-        fun valueAt(time: Tick): PicturePoint
-    }
-
-    /**
      * Calculates the whole picture using Fourier series
-     * with a given number of terms [vectorNumber].
+     * with a given number of terms [vectorsCount].
      */
-    suspend fun calculatePicture(vectorNumber: Int): Picture = coroutineScope {
-        val n = (vectorNumber - 1) / 2
-        val coefs = fourierCalculator.calculateCoefficients(n).sorted()
+    suspend fun calculatePicture(vectorsCount: Int): List<PictureFrame> = coroutineScope {
+        val coefs = fourierCalculator.calculateCoefficients(vectorsCount / 2).sorted()
         val picturePointCount = (1f / TIME_RANGE_STEP).toInt()
-        val picturePoints = ArrayList<Deferred<PicturePoint>>()
+        val pictureTicks = ArrayList<Deferred<PictureFrame>>()
         for (pointNumber in 0..picturePointCount) {
             val time = Tick(TIME_RANGE_STEP * pointNumber)
             val point = async(Dispatchers.Default) {
                 calculatePoint(coefs, time)
             }
-            picturePoints.add(point)
+            pictureTicks.add(point)
         }
-        PictureWithoutInterpolation(picturePoints.awaitAll())
+        pictureTicks.awaitAll()
     }
 
 
-    private fun calculatePoint(coefficients: List<FourierCoefficient>, time: Tick): PicturePoint {
-        var sumVector = Complex(0f, 0f)
-        val vectors = ArrayList<Complex>(coefficients.size)
+    private fun calculatePoint(coefficients: List<FourierCoefficient>, tick: Tick): PictureFrame {
+        val vectors = ArrayList<FourierVector>(coefficients.size)
 
         coefficients.forEach { coef ->
-            val vector = coef.toComplex(time.value)
-            sumVector += vector
-            vectors.add(vector)
+            val angle = coef.angle(tick)
+            val vector = coef.toComplex(angle)
+            val prevVectorEnd = vectors.lastOrNull()?.dst ?: Complex(0f, 0f)
+            val fourierVector = FourierVector(
+                tick = tick,
+                src = prevVectorEnd,
+                dst = prevVectorEnd + vector,
+                angle = angle,
+                coefficient = coef
+            )
+            vectors.add(fourierVector)
         }
 
-        return PicturePoint(
-            time = time,
-            point = sumVector,
-            vectors = vectors
-        )
-    }
-
-    private class PictureWithoutInterpolation(
-        private val sortedPoints: List<PicturePoint>
-    ) : Picture {
-
-        init {
-            if (sortedPoints.isEmpty()) {
-                throw IllegalArgumentException("Picture points must not be empty")
-            }
-        }
-
-        override fun valueAt(time: Tick): PicturePoint {
-            val index = sortedPoints.binarySearch {
-                val diff = it.time - time
-                when {
-                    diff < 0f -> -1
-                    diff > 0f -> +1
-                    else -> 0
-                }
-            }
-            if (index >= 0) {
-                return sortedPoints[index]
-            } else {
-                val correctIndex = (-index - 1).coerceAtMost(sortedPoints.lastIndex)
-                return sortedPoints[correctIndex]
-            }
-        }
+        return PictureFrame(tick = tick, vectors = vectors)
     }
 }

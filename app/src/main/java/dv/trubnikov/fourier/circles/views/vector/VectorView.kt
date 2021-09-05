@@ -1,14 +1,16 @@
 package dv.trubnikov.fourier.circles.views
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import androidx.core.graphics.withRotation
 import androidx.core.graphics.withTranslation
 import dv.trubnikov.fourier.circles.R
+import dv.trubnikov.fourier.circles.calculates.searchers.PictureTicks
 import dv.trubnikov.fourier.circles.models.Complex
+import dv.trubnikov.fourier.circles.models.Tick
 import dv.trubnikov.fourier.circles.models.toDegree
-import dv.trubnikov.fourier.circles.presentation.vector.controllers.PictureController
 import kotlin.math.*
 
 class VectorView @JvmOverloads constructor(
@@ -46,27 +48,34 @@ class VectorView @JvmOverloads constructor(
         strokeWidth = 1f
         style = Paint.Style.STROKE
     }
+    private val animator = ValueAnimator.ofFloat(Tick.MIN_VALUE, Tick.MAX_VALUE).apply {
+        repeatMode = ValueAnimator.RESTART
+        duration = 20_000
+        addUpdateListener { invalidate() }
+    }
 
     init {
         setBackgroundColor(context.getColor(R.color.vector_background_color))
     }
 
-    private var lastState: PictureController.VectorPicture? = null
+    private var pictureTicks: PictureTicks? = null
 
     private val originalPath = Path()
     private val arrowPath = Path()
 
-    fun drawVectorPicture(picture: PictureController.VectorPicture) {
-        lastState = picture
-        postInvalidate()
+    fun setPicture(picture: PictureTicks) {
+        this.pictureTicks = picture
+        animator.start()
     }
 
     override fun onDraw(canvas: Canvas) {
         // TODO: Строить точки не на мейн потоке, а в фоне перед вызовом postInvalidate()
         super.onDraw(canvas)
-        val picture = lastState ?: return
+        val tick = Tick(animator.animatedFraction)
+        val picture = pictureTicks?.valueFor(tick) ?: return
+        println("KekPek: ValueAnimator tick=[$tick]")
 
-        drawFourierPath(canvas, picture.drawingPath)
+        drawFourSierPath(canvas, picture.drawingPath)
 
         originalPath.let { path ->
             picture.originalPath.toPath(path)
