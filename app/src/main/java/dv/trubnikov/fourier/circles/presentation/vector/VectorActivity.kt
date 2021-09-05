@@ -10,12 +10,10 @@ import androidx.activity.viewModels
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.databinding.ActivityVectorBinding
 import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.getComplex
 import dv.trubnikov.fourier.circles.models.putComplex
-import dv.trubnikov.fourier.circles.presentation.draw.DrawActivity
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -62,10 +60,17 @@ class VectorActivity : ComponentActivity() {
             }
         )
         binding.deleteButton.setOnClickListener {
-            val drawIntent = DrawActivity.getIntent(this)
-            startActivity(drawIntent)
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-            finish()
+//            val drawIntent = DrawActivity.getIntent(this)
+//            startActivity(drawIntent)
+//            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+//            finish()
+            with(binding.vectorView) {
+                if (isPaused) {
+                    binding.vectorView.resume()
+                } else {
+                    binding.vectorView.pause()
+                }
+            }
         }
         binding.bottomSheet.root.setOnClickListener {
             val behaviour = BottomSheetBehavior.from(it)
@@ -81,12 +86,13 @@ class VectorActivity : ComponentActivity() {
     private fun setupCollects() {
         lifecycleScope.launchWhenResumed {
             viewModel.pictureFlow.collect {
-                binding.vectorView.drawVectorPicture(it)
+                binding.vectorView.setPicture(it)
             }
         }
         lifecycleScope.launchWhenResumed {
             viewModel.vectorsNumberFlow.collect {
                 binding.bottomSheet.vectorCountText.text = it.toString()
+                binding.vectorView.setVectorCount(it)
             }
         }
         binding.bottomSheet.vectorCountSeekbar.progress = viewModel.vectorsNumberFlow.value

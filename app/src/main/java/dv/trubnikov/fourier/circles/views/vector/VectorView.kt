@@ -1,17 +1,20 @@
-package dv.trubnikov.fourier.circles.views
+package dv.trubnikov.fourier.circles.views.vector
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
 import android.util.AttributeSet
-import androidx.core.graphics.withRotation
-import androidx.core.graphics.withTranslation
+import android.view.animation.LinearInterpolator
+import androidx.core.animation.doOnRepeat
 import dv.trubnikov.fourier.circles.R
-import dv.trubnikov.fourier.circles.calculates.searchers.PictureTicks
-import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.Tick
-import dv.trubnikov.fourier.circles.models.toDegree
-import kotlin.math.*
+import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
+import dv.trubnikov.fourier.circles.tools.withMathCoordinates
+import dv.trubnikov.fourier.circles.views.AxisView
+import dv.trubnikov.fourier.circles.views.vector.drawers.ArrowVectorDrawer
+import dv.trubnikov.fourier.circles.views.vector.drawers.RadiusVectorDrawer
+import dv.trubnikov.fourier.circles.views.vector.drawers.TraceVectorDrawer
+import dv.trubnikov.fourier.circles.views.vector.drawers.UserPictureVectorDrawer
 
 class VectorView @JvmOverloads constructor(
     context: Context,
@@ -20,144 +23,72 @@ class VectorView @JvmOverloads constructor(
     defStyleRes: Int = 0
 ) : AxisView(context, attrs, defStyleAttr, defStyleRes) {
 
-    companion object {
-        private val MIN_ARROW_WIDTH = 30f
-    }
-
-    private val VECTOR_PAINT = Paint().apply {
-        color = Color.YELLOW
-        isAntiAlias = true
-        strokeWidth = 3f
-    }
-    private val USER_PATH_PAINT = Paint().apply {
-        color = context.getColor(R.color.vector_color)
-        isAntiAlias = true
-        strokeWidth = 3f
-        style = Paint.Style.STROKE
-        pathEffect = DashPathEffect(floatArrayOf(10f, 20f), 0f)
-    }
-    private val FOURIER_PATH_PAINT = Paint().apply {
-        color = Color.RED
-        isAntiAlias = true
-        strokeWidth = 5f
-        style = Paint.Style.STROKE
-    }
-    private val ARROW_CIRCLE_PAINT = Paint().apply {
-        color = Color.GRAY
-        isAntiAlias = true
-        strokeWidth = 1f
-        style = Paint.Style.STROKE
-    }
-    private val animator = ValueAnimator.ofFloat(Tick.MIN_VALUE, Tick.MAX_VALUE).apply {
-        repeatMode = ValueAnimator.RESTART
-        duration = 20_000
-        addUpdateListener { invalidate() }
-    }
-
     init {
         setBackgroundColor(context.getColor(R.color.vector_background_color))
     }
 
-    private var pictureTicks: PictureTicks? = null
+    /**
+     * Drawers are arranged in the order in which they
+     * will be rendered, so the order is important.
+     */
+    private val drawers: List<VectorDrawer> = listOf(
+        TraceVectorDrawer(),
+        UserPictureVectorDrawer(context),
+        RadiusVectorDrawer(),
+        ArrowVectorDrawer(),
+    )
 
-    private val originalPath = Path()
-    private val arrowPath = Path()
-
-    fun setPicture(picture: PictureTicks) {
-        this.pictureTicks = picture
-        animator.start()
+    private val animator = ValueAnimator.ofFloat(Tick.MIN_VALUE, Tick.MAX_VALUE).apply {
+        interpolator = LinearInterpolator()
+        repeatMode = ValueAnimator.RESTART
+        repeatCount = ValueAnimator.INFINITE
+        duration = 10_000
+        addUpdateListener { invalidate() }
+        doOnRepeat { drawers.forEach { it.onAnimationRepeat() } }
     }
 
-    override fun onDraw(canvas: Canvas) {
-        // TODO: Строить точки не на мейн потоке, а в фоне перед вызовом postInvalidate()
-        super.onDraw(canvas)
-        val tick = Tick(animator.animatedFraction)
-        val picture = pictureTicks?.valueFor(tick) ?: return
-        println("KekPek: ValueAnimator tick=[$tick]")
+    private var picture: VectorPicture? = null
+    private var vectorCount: Int = 0
 
-        drawFourSierPath(canvas, picture.drawingPath)
+    val isPaused: Boolean
+        get() = animator.isPaused
 
-        originalPath.let { path ->
-            picture.originalPath.toPath(path)
-            path.close()
-            canvas.drawPath(path, USER_PATH_PAINT)
+    fun resume() {
+        animator.resume()
+    }
+
+    fun pause() {
+        animator.pause()
+    }
+
+    fun setPicture(picture: VectorPicture) {
+        post {
+            this.picture = picture
+            drawers.forEach { drawer -> drawer.onPictureUpdate(picture) }
+            animator.start()
         }
-
-        drawVectors(canvas, picture.vectors)
     }
 
-    private fun drawVectors(canvas: Canvas, vectors: List<Complex>) {
-        var x = width / 2f
-        var y = height / 2f
-        var x0: Float
-        var y0: Float
-        for (vector in vectors) {
-            x0 = x
-            y0 = y
-            x += vector.real
-            y += vector.image
-            drawVector(canvas, x0, height - y0, x, height - y)
-        }
-    }
-
-    private fun drawVector(canvas: Canvas, x0: Float, y0: Float, x1: Float, y1: Float) {
-        val length = hypot(y1 - y0, x1 - x0)
-        val angle = atan2(y1 - y0, x1 - x0)
-        canvas.withTranslation(x0, y0) {
-            canvas.withRotation(angle.toDegree()) {
-                drawCircle(canvas, length)
-                canvas.drawLine(0f, 0f, length, 0f, VECTOR_PAINT)
-                drawArrow(canvas, length)
+    fun setVectorCount(vectorCount: Int) {
+        post {
+            this.vectorCount = vectorCount
+            drawers.forEach { drawer ->
+                drawer.onVectorCountChanged(vectorCount)
             }
         }
     }
 
-    private fun drawArrow(canvas: Canvas, length: Float) {
-        val arrowLength = min(MIN_ARROW_WIDTH, length * 0.25f)
-        val arrowHeight = arrowLength * cos(PI.toFloat() / 6)
-        arrowPath.reset()
-        arrowPath.moveTo(length, 0f)
-        arrowPath.lineTo(length - arrowHeight, +arrowLength / 2)
-        arrowPath.lineTo(length - arrowHeight, -arrowLength / 2)
-        arrowPath.close()
-        canvas.drawPath(arrowPath, VECTOR_PAINT)
-    }
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
 
-    private fun drawCircle(canvas: Canvas, radius: Float) {
-        canvas.drawCircle(0f, 0f, radius, ARROW_CIRCLE_PAINT)
-    }
+        val picture = picture ?: return
+        val tick = Tick(animator.animatedValue as Float)
+        val pictureFrame = picture.valueFor(tick)
+        val vectors = pictureFrame.vectors.subList(0, vectorCount)
 
-    private fun drawFourierPath(canvas: Canvas, points: List<Complex>) {
-        if (points.size < 2) {
-            return
-        }
-        var x1 = width / 2 + points.first().real
-        var y1 = height / 2 - points.first().image
-        var x0: Float
-        var y0: Float
-        for (i in 1..points.lastIndex) {
-            val alpha = 255 * i / points.lastIndex
-            FOURIER_PATH_PAINT.alpha = alpha.coerceIn(150, 255)
-            x0 = x1
-            y0 = y1
-            x1 = width / 2 + points[i].real
-            y1 = height / 2 - points[i].image
-            canvas.drawLine(x0, y0, x1, y1, FOURIER_PATH_PAINT)
-        }
-    }
-
-    private fun List<Complex>.toPath(path: Path) {
-        path.rewind()
-        val halfScreenX = width / 2
-        val halfScreenY = height / 2
-        for (index in this.indices) {
-            val point = get(index)
-            val x = halfScreenX + point.real
-            val y = halfScreenY - point.image
-            if (index == 0) {
-                path.moveTo(x, y)
-            } else {
-                path.lineTo(x, y)
+        canvas.withMathCoordinates(width, height) {
+            drawers.forEach { vectorDrawer ->
+                vectorDrawer.onDraw(canvas, vectors)
             }
         }
     }

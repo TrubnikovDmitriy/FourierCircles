@@ -1,13 +1,22 @@
-package dv.trubnikov.fourier.circles.calculates.searchers
+package dv.trubnikov.fourier.circles.presentation.vector
 
+import dv.trubnikov.fourier.circles.calculates.searchers.BinarySearcher
+import dv.trubnikov.fourier.circles.calculates.searchers.ValueSearcher
+import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.PictureFrame
 import dv.trubnikov.fourier.circles.models.Tick
 
-class PictureFrameSearcher(pictureFrames: List<PictureFrame>) : ValueSearcher<Tick, PictureFrame> {
+class VectorPicture(
+    val originalPath: List<Complex>,
+    pictureFrames: List<PictureFrame>
+) : ValueSearcher<Tick, PictureFrame> {
 
     init {
+        if (originalPath.isEmpty()) {
+            error("Original path must not be empty")
+        }
         if (pictureFrames.isEmpty()) {
-            error("Picture points must not be empty")
+            error("Picture frames must not be empty")
         }
     }
 
