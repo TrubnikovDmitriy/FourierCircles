@@ -7,13 +7,16 @@ import android.view.View
 import android.widget.SeekBar
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.databinding.ActivityVectorBinding
 import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.getComplex
 import dv.trubnikov.fourier.circles.models.putComplex
+import dv.trubnikov.fourier.circles.presentation.draw.DrawActivity
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -59,18 +62,21 @@ class VectorActivity : ComponentActivity() {
                 }
             }
         )
-        binding.deleteButton.setOnClickListener {
-//            val drawIntent = DrawActivity.getIntent(this)
-//            startActivity(drawIntent)
-//            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-//            finish()
-            with(binding.vectorView) {
-                if (isPaused) {
-                    binding.vectorView.resume()
-                } else {
-                    binding.vectorView.pause()
-                }
-            }
+        binding.controls.deleteButton.setOnClickListener {
+            val drawIntent = DrawActivity.getIntent(this)
+            startActivity(drawIntent)
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            finish()
+        }
+        binding.controls.playButton.setOnClickListener {
+            binding.vectorView.resume()
+            binding.controls.playButton.isVisible = false
+            binding.controls.pauseButton.isVisible = true
+        }
+        binding.controls.pauseButton.setOnClickListener {
+            binding.vectorView.pause()
+            binding.controls.playButton.isVisible = true
+            binding.controls.pauseButton.isVisible = false
         }
         binding.bottomSheet.root.setOnClickListener {
             val behaviour = BottomSheetBehavior.from(it)
@@ -126,9 +132,8 @@ class VectorActivity : ComponentActivity() {
             binding.sidebarRecyclerRight.apply {
                 translationX = +width * (1f - slideOffset)
             }
-            binding.deleteButton.apply {
-                translationX = -width * slideOffset
-                alpha = 1f - slideOffset
+            binding.controls.root.apply {
+                translationX = -binding.sidebarRecyclerRight.width * slideOffset
             }
             binding.vectorView.updatePadding(
                 left = (binding.sidebarRecyclerLeft.width * slideOffset).toInt(),

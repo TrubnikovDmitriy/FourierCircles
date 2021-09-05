@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/vector_background_color"
+    android:orientation="horizontal">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/play_button"
+        android:layout_width="@dimen/ic_size"
+        android:layout_height="@dimen/ic_size"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_play"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/pause_button"
+        android:layout_width="@dimen/ic_size"
+        android:layout_height="@dimen/ic_size"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_pause" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/delete_button"
+        android:layout_width="@dimen/ic_size"
+        android:layout_height="@dimen/ic_size"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_trash" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

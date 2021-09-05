@@ -52,9 +52,6 @@ class VectorView @JvmOverloads constructor(
     private var picture: VectorPicture? = null
     private var vectorCount: Int = 0
 
-    val isPaused: Boolean
-        get() = animator.isPaused
-
     fun resume() {
         animator.resume()
     }
