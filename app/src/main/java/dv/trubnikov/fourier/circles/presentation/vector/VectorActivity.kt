@@ -130,8 +130,7 @@ class VectorActivity : ComponentActivity() {
                 translationX = -width * slideOffset
                 alpha = 1f - slideOffset
             }
-            // TODO: Instead of using container-view, start respecting padding in custom VectorView
-            binding.vectorViewContainer.updatePadding(
+            binding.vectorView.updatePadding(
                 left = (binding.sidebarRecyclerLeft.width * slideOffset).toInt(),
                 right = (binding.sidebarRecyclerRight.width * slideOffset).toInt(),
                 bottom = (binding.root.height - binding.bottomSheet.root.top)

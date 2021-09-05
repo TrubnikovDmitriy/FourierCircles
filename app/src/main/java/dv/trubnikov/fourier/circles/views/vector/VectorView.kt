@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.animation.LinearInterpolator
 import androidx.core.animation.doOnRepeat
+import androidx.core.graphics.withScale
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.Tick
 import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
@@ -15,6 +16,7 @@ import dv.trubnikov.fourier.circles.views.vector.drawers.ArrowVectorDrawer
 import dv.trubnikov.fourier.circles.views.vector.drawers.RadiusVectorDrawer
 import dv.trubnikov.fourier.circles.views.vector.drawers.TraceVectorDrawer
 import dv.trubnikov.fourier.circles.views.vector.drawers.UserPictureVectorDrawer
+import kotlin.math.min
 
 class VectorView @JvmOverloads constructor(
     context: Context,
@@ -86,9 +88,14 @@ class VectorView @JvmOverloads constructor(
         val pictureFrame = picture.valueFor(tick)
         val vectors = pictureFrame.vectors.subList(0, vectorCount)
 
-        canvas.withMathCoordinates(width, height) {
-            drawers.forEach { vectorDrawer ->
-                vectorDrawer.onDraw(canvas, vectors)
+        val widthScale = (width - paddingLeft - paddingRight).toFloat() / width
+        val heightScale = (height - paddingTop - paddingBottom).toFloat() / height
+        val scale = min(widthScale, heightScale)
+        canvas.withScale(x = scale, y = scale, pivotX = width / 2f, pivotY = height / 2f) {
+            canvas.withMathCoordinates(width, height) {
+                drawers.forEach { vectorDrawer ->
+                    vectorDrawer.onDraw(canvas, vectors)
+                }
             }
         }
     }

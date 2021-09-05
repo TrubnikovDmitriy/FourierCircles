@@ -5,18 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/vector_view_container"
+    <dv.trubnikov.fourier.circles.views.vector.VectorView
+        android:id="@+id/vector_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/vector_background_color">
-
-        <dv.trubnikov.fourier.circles.views.vector.VectorView
-            android:id="@+id/vector_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </FrameLayout>
+        android:layout_height="match_parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/delete_button"
