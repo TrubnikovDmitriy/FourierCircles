@@ -6,17 +6,24 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 data class FourierCoefficient(
+    val number: Int,
     val amplitude: Float,
-    val argument: Float,
-    val n: Int,
+    val startAngle: Float,
+    val frequency: Float,
 ) : Comparable<FourierCoefficient> {
 
-    fun angle(time: Float): Float {
-        return PI_2 * n * time + argument
+    constructor(number: Int, amplitude: Float, startAngle: Float) : this(
+        number = number,
+        amplitude = amplitude,
+        startAngle = startAngle,
+        frequency = PI_2 * number
+    )
+
+    fun angle(time: Tick): Float {
+        return startAngle + PI_2 * number * time.value
     }
 
-    fun toComplex(time: Float): Complex {
-        val angle = angle(time)
+    fun toComplex(angle: Float): Complex {
         val real = amplitude * cos(angle)
         val image = amplitude * sin(angle)
         return Complex(real = real, image = image)
@@ -24,11 +31,11 @@ data class FourierCoefficient(
 
     override fun compareTo(other: FourierCoefficient): Int {
         // 0, -1, +1, -2, +2...
-        val absDiff = n.absoluteValue - other.n.absoluteValue
+        val absDiff = number.absoluteValue - other.number.absoluteValue
         if (absDiff != 0) {
             return absDiff
         } else {
-            return n - other.n
+            return number - other.number
         }
     }
 }

@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.SeekBar
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -61,11 +62,21 @@ class VectorActivity : ComponentActivity() {
                 }
             }
         )
-        binding.deleteButton.setOnClickListener {
+        binding.controls.deleteButton.setOnClickListener {
             val drawIntent = DrawActivity.getIntent(this)
             startActivity(drawIntent)
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
             finish()
+        }
+        binding.controls.playButton.setOnClickListener {
+            binding.vectorView.resume()
+            binding.controls.playButton.isVisible = false
+            binding.controls.pauseButton.isVisible = true
+        }
+        binding.controls.pauseButton.setOnClickListener {
+            binding.vectorView.pause()
+            binding.controls.playButton.isVisible = true
+            binding.controls.pauseButton.isVisible = false
         }
         binding.bottomSheet.root.setOnClickListener {
             val behaviour = BottomSheetBehavior.from(it)
@@ -81,12 +92,13 @@ class VectorActivity : ComponentActivity() {
     private fun setupCollects() {
         lifecycleScope.launchWhenResumed {
             viewModel.pictureFlow.collect {
-                binding.vectorView.drawVectorPicture(it)
+                binding.vectorView.setPicture(it)
             }
         }
         lifecycleScope.launchWhenResumed {
             viewModel.vectorsNumberFlow.collect {
                 binding.bottomSheet.vectorCountText.text = it.toString()
+                binding.vectorView.setVectorCount(it)
             }
         }
         binding.bottomSheet.vectorCountSeekbar.progress = viewModel.vectorsNumberFlow.value
@@ -120,12 +132,10 @@ class VectorActivity : ComponentActivity() {
             binding.sidebarRecyclerRight.apply {
                 translationX = +width * (1f - slideOffset)
             }
-            binding.deleteButton.apply {
-                translationX = -width * slideOffset
-                alpha = 1f - slideOffset
+            binding.controls.root.apply {
+                translationX = -binding.sidebarRecyclerRight.width * slideOffset
             }
-            // TODO: Instead of using container-view, start respecting padding in custom VectorView
-            binding.vectorViewContainer.updatePadding(
+            binding.vectorView.updatePadding(
                 left = (binding.sidebarRecyclerLeft.width * slideOffset).toInt(),
                 right = (binding.sidebarRecyclerRight.width * slideOffset).toInt(),
                 bottom = (binding.root.height - binding.bottomSheet.root.top)

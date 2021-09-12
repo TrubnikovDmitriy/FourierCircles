@@ -2,4 +2,5 @@
 <resources>
     <dimen name="bg_corner_radius">28dp</dimen>
     <dimen name="sidebar_width">32dp</dimen>
+    <dimen name="ic_size">32dp</dimen>
 </resources>

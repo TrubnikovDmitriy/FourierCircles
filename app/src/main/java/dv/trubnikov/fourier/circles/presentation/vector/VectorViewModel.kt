@@ -5,31 +5,31 @@ import androidx.lifecycle.viewModelScope
 import dv.trubnikov.fourier.circles.calculates.FourierCalculator
 import dv.trubnikov.fourier.circles.calculates.PictureCalculator
 import dv.trubnikov.fourier.circles.models.Complex
-import dv.trubnikov.fourier.circles.presentation.vector.controllers.PictureController
-import dv.trubnikov.fourier.circles.presentation.vector.controllers.PictureController.VectorPicture
-import dv.trubnikov.fourier.circles.presentation.vector.controllers.TimeController
-import kotlinx.coroutines.*
+import dv.trubnikov.fourier.circles.tools.StateSharedFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.sample
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 class VectorViewModel : ViewModel() {
 
     companion object {
+        private const val MAX_NUMBER_OF_VECTORS = 50
         private const val DEFAULT_NUMBER_OF_VECTORS = 5
         private const val USER_INPUT_SAMPLING_MS = 50L
     }
 
-    private var pictureCalculator: PictureCalculator? = null
-    private var userPicture: List<Complex>? = null
-
-    private val timeController = TimeController(viewModelScope)
-    private val pictureController = PictureController(viewModelScope, timeController)
     private val userInputVector = MutableSharedFlow<Int>(
-        replay = 5, onBufferOverflow = BufferOverflow.DROP_OLDEST
+        replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    val pictureFlow: SharedFlow<VectorPicture> = pictureController.pictureFlow
+    val pictureFlow = StateSharedFlow<VectorPicture>()
     val vectorsNumberFlow = MutableStateFlow(DEFAULT_NUMBER_OF_VECTORS)
 
     init {
@@ -42,7 +42,7 @@ class VectorViewModel : ViewModel() {
 
     suspend fun setUserPicture(userPath: List<Complex>) {
         if (userPath.isEmpty()) {
-            userPicture = null
+            // TODO logger
             return
         }
         viewModelScope.launch(Dispatchers.Default) {
@@ -51,13 +51,9 @@ class VectorViewModel : ViewModel() {
                 userPath[index]
             }
             val pictureCalculator = PictureCalculator(fourierCalculator)
-            val picture = pictureCalculator.calculatePicture(vectorsNumberFlow.value)
-            timeController.restart()
-            pictureController.setPicture(userPath, picture)
-
-
-            this@VectorViewModel.pictureCalculator = pictureCalculator
-            this@VectorViewModel.userPicture = userPath
+            val pictureFrames = pictureCalculator.calculatePicture(MAX_NUMBER_OF_VECTORS)
+            val vectorPicture = VectorPicture(userPath, pictureFrames)
+            pictureFlow.emit(vectorPicture)
         }
     }
 
@@ -66,13 +62,9 @@ class VectorViewModel : ViewModel() {
     }
 
     private suspend fun changeNumberOfVectors(number: Int) {
-        val userPicture = userPicture ?: return
-        val pictureCalculator = pictureCalculator ?: return
         withContext(Dispatchers.Default) {
-            val vectorsNumber = (number * 1.5f).roundToInt() / 2 * 2 + 1
-            val fourierPicture = pictureCalculator.calculatePicture(vectorsNumber)
-            pictureController.setPicture(userPicture, fourierPicture)
-            vectorsNumberFlow.value = vectorsNumber
+            val vectorsCount = (number * MAX_NUMBER_OF_VECTORS / 100f).roundToInt()
+            vectorsNumberFlow.value = max(1, vectorsCount)
         }
     }
 }
