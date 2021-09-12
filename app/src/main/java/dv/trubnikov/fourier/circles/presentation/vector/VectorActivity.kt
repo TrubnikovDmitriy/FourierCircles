@@ -1,5 +1,6 @@
 package dv.trubnikov.fourier.circles.presentation.vector
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -52,6 +53,7 @@ class VectorActivity : ComponentActivity() {
         setupControlPanel()
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupListeners() {
         binding.bottomSheet.vectorCountSeekbar.setOnSeekBarChangeListener(
             object : SeekBar.OnSeekBarChangeListener {
@@ -87,6 +89,10 @@ class VectorActivity : ComponentActivity() {
             }
             behaviour.state = desiredState
         }
+        val scaleListener = ScaleGestureListener(this) {
+            binding.vectorView.setScaleFactor(it)
+        }
+        binding.vectorView.setOnTouchListener(scaleListener)
     }
 
     private fun setupCollects() {

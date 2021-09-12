@@ -70,12 +70,11 @@ class VectorView @JvmOverloads constructor(
     }
 
     fun setVectorCount(vectorCount: Int) {
-        post {
-            this.vectorCount = vectorCount
-            drawers.forEach { drawer ->
-                drawer.onVectorCountChanged(vectorCount)
-            }
+        this.vectorCount = vectorCount
+        drawers.forEach { drawer ->
+            drawer.onVectorCountChanged(vectorCount)
         }
+        postInvalidate()
     }
 
     fun setScaleFactor(scaleFactor: Float) {
