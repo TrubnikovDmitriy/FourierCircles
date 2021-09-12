@@ -1,13 +1,13 @@
-package dv.trubnikov.fourier.circles.views.vector.drawers
+package dv.trubnikov.fourier.circles.views.drawers.vectors
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import dv.trubnikov.fourier.circles.models.FourierVector
 import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
-import dv.trubnikov.fourier.circles.views.vector.VectorDrawer
+import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
 
-class TraceVectorDrawer : VectorDrawer {
+class TraceDrawer : CanvasDrawer {
 
     companion object {
         private const val MIN_TRACE_ALPHA = 150

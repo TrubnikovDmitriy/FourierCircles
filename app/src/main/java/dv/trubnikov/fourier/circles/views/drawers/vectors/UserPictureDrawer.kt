@@ -1,4 +1,4 @@
-package dv.trubnikov.fourier.circles.views.vector.drawers
+package dv.trubnikov.fourier.circles.views.drawers.vectors
 
 import android.content.Context
 import android.graphics.Canvas
@@ -8,9 +8,9 @@ import android.graphics.Path
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.FourierVector
 import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
-import dv.trubnikov.fourier.circles.views.vector.VectorDrawer
+import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
 
-class UserPictureVectorDrawer(context: Context) : VectorDrawer {
+class UserPictureDrawer(context: Context) : CanvasDrawer {
 
     private val userPicture = Path()
     private val userPicturePaint = Paint().apply {

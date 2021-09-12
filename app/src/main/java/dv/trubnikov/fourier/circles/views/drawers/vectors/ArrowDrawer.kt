@@ -1,4 +1,4 @@
-package dv.trubnikov.fourier.circles.views.vector.drawers
+package dv.trubnikov.fourier.circles.views.drawers.vectors
 
 import android.graphics.Canvas
 import android.graphics.Color
@@ -8,12 +8,12 @@ import androidx.core.graphics.withRotation
 import androidx.core.graphics.withTranslation
 import dv.trubnikov.fourier.circles.models.FourierVector
 import dv.trubnikov.fourier.circles.models.toDegree
-import dv.trubnikov.fourier.circles.views.vector.VectorDrawer
+import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.min
 
-class ArrowVectorDrawer : VectorDrawer {
+class ArrowDrawer : CanvasDrawer {
 
     companion object {
         private const val MIN_ARROW_WIDTH = 30f

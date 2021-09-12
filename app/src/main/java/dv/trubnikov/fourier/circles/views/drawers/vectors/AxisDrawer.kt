@@ -1,4 +1,4 @@
-package dv.trubnikov.fourier.circles.views.vector.drawers
+package dv.trubnikov.fourier.circles.views.drawers.vectors
 
 import android.content.Context
 import android.graphics.Canvas
@@ -6,10 +6,10 @@ import android.graphics.Color
 import android.graphics.Paint
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.FourierVector
-import dv.trubnikov.fourier.circles.views.vector.VectorDrawer
+import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
 import kotlin.math.max
 
-class AxisVectorDrawer(context: Context) : VectorDrawer {
+class AxisDrawer(context: Context) : CanvasDrawer {
 
     private val backgroundColor = context.getColor(R.color.vector_background_color)
     private val axisPaint = Paint().apply {

@@ -16,7 +16,8 @@ import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.Tick
 import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
 import dv.trubnikov.fourier.circles.tools.withMathCoordinates
-import dv.trubnikov.fourier.circles.views.vector.drawers.*
+import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
+import dv.trubnikov.fourier.circles.views.drawers.vectors.*
 import kotlin.math.min
 
 class VectorView @JvmOverloads constructor(
@@ -34,12 +35,12 @@ class VectorView @JvmOverloads constructor(
      * Drawers are arranged in the order in which they
      * will be rendered, so the order is important.
      */
-    private val drawers: List<VectorDrawer> = listOf(
-        AxisVectorDrawer(context),
-        TraceVectorDrawer(),
-        UserPictureVectorDrawer(context),
-        RadiusVectorDrawer(),
-        ArrowVectorDrawer(),
+    private val drawers: List<CanvasDrawer> = listOf(
+        AxisDrawer(context),
+        TraceDrawer(),
+        UserPictureDrawer(context),
+        RadiusDrawer(),
+        ArrowDrawer(),
     )
 
     private val animator = ValueAnimator.ofFloat(Tick.MIN_VALUE, Tick.MAX_VALUE).apply {
