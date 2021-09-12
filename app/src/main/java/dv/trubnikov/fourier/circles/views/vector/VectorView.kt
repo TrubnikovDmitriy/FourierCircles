@@ -3,12 +3,16 @@ package dv.trubnikov.fourier.circles.views.vector
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.animation.doOnRepeat
+import androidx.core.graphics.withClip
 import androidx.core.graphics.withScale
+import androidx.core.graphics.withTranslation
 import dv.trubnikov.fourier.circles.R
+import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.Tick
 import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
 import dv.trubnikov.fourier.circles.tools.withMathCoordinates
@@ -47,8 +51,17 @@ class VectorView @JvmOverloads constructor(
         doOnRepeat { drawers.forEach { it.onAnimationRepeat() } }
     }
 
+    private val scaleWindowWidth = resources.getDimension(R.dimen.scale_window_width)
+    private val scaleWindowHeight = resources.getDimension(R.dimen.scale_window_height)
+    private val scaleWindowBorderPaint = Paint().apply {
+        strokeWidth = 3f
+        color = context.getColor(R.color.vector_color)
+        style = Paint.Style.STROKE
+    }
+
     private var picture: VectorPicture? = null
     private var vectorCount: Int = 0
+    private var scaleFactor = 2f
 
     fun resume() {
         animator.resume()
@@ -75,6 +88,11 @@ class VectorView @JvmOverloads constructor(
         }
     }
 
+    fun setScaleFactor(scaleFactor: Float) {
+        this.scaleFactor = scaleFactor
+        postInvalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -91,6 +109,11 @@ class VectorView @JvmOverloads constructor(
                 drawers.forEach { vectorDrawer ->
                     vectorDrawer.onDraw(canvas, vectors)
                 }
+                withScaleWindow(vectors.last().dst, scaleFactor) {
+                    drawers.forEach { vectorDrawer ->
+                        vectorDrawer.onDraw(canvas, vectors)
+                    }
+                }
             }
         }
     }
@@ -99,5 +122,36 @@ class VectorView @JvmOverloads constructor(
         if (changed) {
             drawers.forEach { it.onSizeChanged(width = width, height = height) }
         }
+    }
+
+    private fun Canvas.withScaleWindow(
+        center: Complex,
+        scaleFactor: Float,
+        block: Canvas.() -> Unit
+    ) {
+        withClip(
+            -width / 2f,
+            height / 2f,
+            -width / 2f + scaleWindowWidth,
+            height / 2f - scaleWindowHeight
+        ) {
+            withTranslation(
+                -width / 2f - scaleFactor * center.real + scaleWindowWidth / 2,
+                +height / 2f - scaleFactor * center.image - scaleWindowHeight / 2,
+            ) {
+                withScale(scaleFactor, scaleFactor, 0f, 0f) {
+                    // Draw content
+                    block()
+                }
+            }
+        }
+        // Draw border
+        drawRect(
+            -width / 2f,
+            height / 2f,
+            -width / 2f + scaleWindowWidth,
+            height / 2f - scaleWindowHeight,
+            scaleWindowBorderPaint
+        )
     }
 }
