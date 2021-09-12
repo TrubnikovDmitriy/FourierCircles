@@ -6,11 +6,13 @@ import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
 
 interface VectorDrawer {
 
-    fun onPictureUpdate(picture: VectorPicture) = Unit
+    fun onAnimationRepeat() = Unit
 
     fun onDraw(canvas: Canvas, vectors: List<FourierVector>)
 
-    fun onVectorCountChanged(vectorCount: Int) = Unit
+    fun onPictureUpdate(picture: VectorPicture) = Unit
 
-    fun onAnimationRepeat() = Unit
+    fun onSizeChanged(width: Int, height: Int) = Unit
+
+    fun onVectorCountChanged(vectorCount: Int) = Unit
 }

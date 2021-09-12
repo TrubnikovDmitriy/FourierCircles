@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
+import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.animation.doOnRepeat
 import androidx.core.graphics.withScale
@@ -11,11 +12,7 @@ import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.Tick
 import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
 import dv.trubnikov.fourier.circles.tools.withMathCoordinates
-import dv.trubnikov.fourier.circles.views.AxisView
-import dv.trubnikov.fourier.circles.views.vector.drawers.ArrowVectorDrawer
-import dv.trubnikov.fourier.circles.views.vector.drawers.RadiusVectorDrawer
-import dv.trubnikov.fourier.circles.views.vector.drawers.TraceVectorDrawer
-import dv.trubnikov.fourier.circles.views.vector.drawers.UserPictureVectorDrawer
+import dv.trubnikov.fourier.circles.views.vector.drawers.*
 import kotlin.math.min
 
 class VectorView @JvmOverloads constructor(
@@ -23,7 +20,7 @@ class VectorView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-) : AxisView(context, attrs, defStyleAttr, defStyleRes) {
+) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     init {
         setBackgroundColor(context.getColor(R.color.vector_background_color))
@@ -34,6 +31,7 @@ class VectorView @JvmOverloads constructor(
      * will be rendered, so the order is important.
      */
     private val drawers: List<VectorDrawer> = listOf(
+        AxisVectorDrawer(context),
         TraceVectorDrawer(),
         UserPictureVectorDrawer(context),
         RadiusVectorDrawer(),
@@ -94,6 +92,12 @@ class VectorView @JvmOverloads constructor(
                     vectorDrawer.onDraw(canvas, vectors)
                 }
             }
+        }
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        if (changed) {
+            drawers.forEach { it.onSizeChanged(width = width, height = height) }
         }
     }
 }
