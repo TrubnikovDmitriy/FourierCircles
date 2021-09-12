@@ -1,16 +1,16 @@
-package dv.trubnikov.fourier.circles.views.vector
+package dv.trubnikov.fourier.circles.views.drawers
 
 import android.graphics.Canvas
 import dv.trubnikov.fourier.circles.models.FourierVector
 import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
 
-interface VectorDrawer {
+interface CanvasDrawer {
 
-    fun onPictureUpdate(picture: VectorPicture) = Unit
+    fun onAnimationRepeat() = Unit
 
     fun onDraw(canvas: Canvas, vectors: List<FourierVector>)
 
-    fun onVectorCountChanged(vectorCount: Int) = Unit
+    fun onPictureUpdate(picture: VectorPicture) = Unit
 
-    fun onAnimationRepeat() = Unit
+    fun onVectorCountChanged(vectorCount: Int) = Unit
 }

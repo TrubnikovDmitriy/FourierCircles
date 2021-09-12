@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
+import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.animation.doOnRepeat
 import androidx.core.graphics.withScale
@@ -11,11 +12,8 @@ import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.Tick
 import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
 import dv.trubnikov.fourier.circles.tools.withMathCoordinates
-import dv.trubnikov.fourier.circles.views.AxisView
-import dv.trubnikov.fourier.circles.views.vector.drawers.ArrowVectorDrawer
-import dv.trubnikov.fourier.circles.views.vector.drawers.RadiusVectorDrawer
-import dv.trubnikov.fourier.circles.views.vector.drawers.TraceVectorDrawer
-import dv.trubnikov.fourier.circles.views.vector.drawers.UserPictureVectorDrawer
+import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
+import dv.trubnikov.fourier.circles.views.drawers.vectors.*
 import kotlin.math.min
 
 class VectorView @JvmOverloads constructor(
@@ -23,7 +21,7 @@ class VectorView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-) : AxisView(context, attrs, defStyleAttr, defStyleRes) {
+) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     init {
         setBackgroundColor(context.getColor(R.color.vector_background_color))
@@ -33,11 +31,12 @@ class VectorView @JvmOverloads constructor(
      * Drawers are arranged in the order in which they
      * will be rendered, so the order is important.
      */
-    private val drawers: List<VectorDrawer> = listOf(
-        TraceVectorDrawer(),
-        UserPictureVectorDrawer(context),
-        RadiusVectorDrawer(),
-        ArrowVectorDrawer(),
+    private val drawers: List<CanvasDrawer> = listOf(
+        AxisDrawer(context),
+        TraceDrawer(),
+        UserPictureDrawer(context),
+        RadiusDrawer(),
+        ArrowDrawer(),
     )
 
     private val animator = ValueAnimator.ofFloat(Tick.MIN_VALUE, Tick.MAX_VALUE).apply {
@@ -48,6 +47,8 @@ class VectorView @JvmOverloads constructor(
         addUpdateListener { invalidate() }
         doOnRepeat { drawers.forEach { it.onAnimationRepeat() } }
     }
+
+    private val scaleWindow = VectorScaleWindow(context)
 
     private var picture: VectorPicture? = null
     private var vectorCount: Int = 0
@@ -69,17 +70,19 @@ class VectorView @JvmOverloads constructor(
     }
 
     fun setVectorCount(vectorCount: Int) {
-        post {
-            this.vectorCount = vectorCount
-            drawers.forEach { drawer ->
-                drawer.onVectorCountChanged(vectorCount)
-            }
+        this.vectorCount = vectorCount
+        drawers.forEach { drawer ->
+            drawer.onVectorCountChanged(vectorCount)
         }
+        postInvalidate()
+    }
+
+    fun setScaleFactor(scaleFactor: Float) {
+        scaleWindow.setScale(scaleFactor)
+        postInvalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-
         val picture = picture ?: return
         val tick = Tick(animator.animatedValue as Float)
         val pictureFrame = picture.valueFor(tick)
@@ -88,10 +91,15 @@ class VectorView @JvmOverloads constructor(
         val widthScale = (width - paddingLeft - paddingRight).toFloat() / width
         val heightScale = (height - paddingTop - paddingBottom).toFloat() / height
         val scale = min(widthScale, heightScale)
-        canvas.withScale(x = scale, y = scale, pivotX = width / 2f, pivotY = height / 2f) {
+        canvas.withScale(x = scale, y = scale, pivotX = width / 2f, pivotY = 0f) {
             canvas.withMathCoordinates(width, height) {
                 drawers.forEach { vectorDrawer ->
                     vectorDrawer.onDraw(canvas, vectors)
+                }
+                scaleWindow.withScaleWindow(canvas, vectors.last().dst) {
+                    drawers.forEach { vectorDrawer ->
+                        vectorDrawer.onDraw(canvas, vectors)
+                    }
                 }
             }
         }
