@@ -7,6 +7,7 @@ import android.graphics.Paint
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.FourierVector
 import dv.trubnikov.fourier.circles.views.vector.VectorDrawer
+import kotlin.math.max
 
 class AxisVectorDrawer(context: Context) : VectorDrawer {
 
@@ -15,17 +16,15 @@ class AxisVectorDrawer(context: Context) : VectorDrawer {
         color = Color.GRAY
     }
 
-    private var halfWidth = 0f
-    private var halfHeight = 0f
+    private var size = 0f
 
     override fun onSizeChanged(width: Int, height: Int) {
-        halfWidth = width / 2f
-        halfHeight = height / 2f
+        size = max(width, height).toFloat()
     }
 
     override fun onDraw(canvas: Canvas, vectors: List<FourierVector>) {
         canvas.drawColor(backgroundColor)
-        canvas.drawLine(-halfWidth, 0f, halfWidth, 0f, axisPaint)
-        canvas.drawLine(0f, -halfHeight, 0f, halfHeight, axisPaint)
+        canvas.drawLine(-size, 0f, size, 0f, axisPaint)
+        canvas.drawLine(0f, -size, 0f, size, axisPaint)
     }
 }

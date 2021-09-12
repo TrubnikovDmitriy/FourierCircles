@@ -20,6 +20,7 @@ class TraceVectorDrawer : VectorDrawer {
     private val tracePaint = Paint().apply {
         color = Color.RED
         isAntiAlias = true
+        strokeCap = Paint.Cap.BUTT
         strokeWidth = 5f
         style = Paint.Style.STROKE
     }

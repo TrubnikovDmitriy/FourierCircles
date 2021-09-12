@@ -17,6 +17,7 @@ class ArrowVectorDrawer : VectorDrawer {
 
     companion object {
         private const val MIN_ARROW_WIDTH = 30f
+        private const val MAX_LINE_WIDTH = 3f
     }
 
     private val arrowPath = Path()
@@ -30,7 +31,9 @@ class ArrowVectorDrawer : VectorDrawer {
         for (vector in vectors) {
             canvas.withTranslation(vector.src.real, vector.src.image) {
                 canvas.withRotation(vector.angle.toDegree()) {
-                    canvas.drawLine(0f, 0f, vector.length, 0f, arrowPaint)
+                    val lineWidth = min(vector.length / 30f, MAX_LINE_WIDTH)
+                    arrowPaint.strokeWidth = lineWidth
+                    canvas.drawLine(0f, 0f, vector.length - lineWidth, 0f, arrowPaint)
                     drawArrow(canvas, vector.length)
                 }
             }

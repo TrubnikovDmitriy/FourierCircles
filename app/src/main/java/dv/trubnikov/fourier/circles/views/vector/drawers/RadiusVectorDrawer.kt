@@ -17,6 +17,7 @@ class RadiusVectorDrawer : VectorDrawer {
 
     override fun onDraw(canvas: Canvas, vectors: List<FourierVector>) {
         for (vector in vectors) {
+            circlePaint.strokeWidth = vector.length / 100f
             canvas.drawCircle(vector.src.real, vector.src.image, vector.length, circlePaint)
         }
     }
