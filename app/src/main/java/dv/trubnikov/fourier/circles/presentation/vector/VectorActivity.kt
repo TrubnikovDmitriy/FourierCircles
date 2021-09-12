@@ -65,6 +65,8 @@ class VectorActivity : ComponentActivity() {
             }
         )
         binding.controls.deleteButton.setOnClickListener {
+            val behaviour = BottomSheetBehavior.from(binding.bottomSheet.root)
+            behaviour.state = BottomSheetBehavior.STATE_COLLAPSED
             val drawIntent = DrawActivity.getIntent(this)
             startActivity(drawIntent)
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
