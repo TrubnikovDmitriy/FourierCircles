@@ -92,7 +92,7 @@ class VectorView @JvmOverloads constructor(
         val widthScale = (width - paddingLeft - paddingRight).toFloat() / width
         val heightScale = (height - paddingTop - paddingBottom).toFloat() / height
         val scale = min(widthScale, heightScale)
-        canvas.withScale(x = scale, y = scale, pivotX = width / 2f, pivotY = height / 2f) {
+        canvas.withScale(x = scale, y = scale, pivotX = width / 2f, pivotY = 0f) {
             canvas.withMathCoordinates(width, height) {
                 drawers.forEach { vectorDrawer ->
                     vectorDrawer.onDraw(canvas, vectors)
@@ -103,13 +103,6 @@ class VectorView @JvmOverloads constructor(
                     }
                 }
             }
-        }
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        if (changed) {
-            scaleWindow.setSize(width = width, height = height)
-            drawers.forEach { it.onSizeChanged(width = width, height = height) }
         }
     }
 }

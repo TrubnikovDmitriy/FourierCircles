@@ -16,13 +16,8 @@ class AxisDrawer(context: Context) : CanvasDrawer {
         color = Color.GRAY
     }
 
-    private var size = 0f
-
-    override fun onSizeChanged(width: Int, height: Int) {
-        size = max(width, height).toFloat()
-    }
-
     override fun onDraw(canvas: Canvas, vectors: List<FourierVector>) {
+        val size = max(canvas.width, canvas.height).toFloat()
         canvas.drawColor(backgroundColor)
         canvas.drawLine(-size, 0f, size, 0f, axisPaint)
         canvas.drawLine(0f, -size, 0f, size, axisPaint)

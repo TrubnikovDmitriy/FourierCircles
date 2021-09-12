@@ -12,7 +12,5 @@ interface CanvasDrawer {
 
     fun onPictureUpdate(picture: VectorPicture) = Unit
 
-    fun onSizeChanged(width: Int, height: Int) = Unit
-
     fun onVectorCountChanged(vectorCount: Int) = Unit
 }
