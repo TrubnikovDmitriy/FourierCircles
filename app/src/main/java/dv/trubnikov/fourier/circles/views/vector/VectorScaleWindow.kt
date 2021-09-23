@@ -35,12 +35,21 @@ class VectorScaleWindow(context: Context) {
     private val scaleTextBound = Rect()
 
     private var scaleFactor = 2f
+    private var isVisible = true
 
     fun setScale(scaleFactor: Float) {
         this.scaleFactor = scaleFactor
     }
 
+    fun toggleVisibility(isVisible: Boolean) {
+        this.isVisible = isVisible
+    }
+
     fun withScaleWindow(canvas: Canvas, center: Complex, block: Canvas.() -> Unit) {
+        if (!isVisible) {
+            return
+        }
+
         canvas.withClip(
             -canvas.width / 2 + scaleWindowRect.left,
             canvas.height / 2 + scaleWindowRect.top,
@@ -56,6 +65,7 @@ class VectorScaleWindow(context: Context) {
                 }
             }
         }
+
         canvas.withTranslation(-canvas.width / 2f, canvas.height / 2f) {
             drawBorder(canvas)
             drawZoomNumber(canvas)

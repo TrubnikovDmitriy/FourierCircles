@@ -25,11 +25,12 @@
         android:background="@drawable/bg_sidebar_right"
         tools:ignore="RtlHardcoded" />
 
-    <FrameLayout
+    <dv.trubnikov.fourier.circles.presentation.vector.sidebars.LeftSidebar
         android:id="@+id/sidebar_recycler_left"
+        android:paddingVertical="@dimen/icon_view_padding"
         android:layout_width="@dimen/sidebar_width"
-        android:layout_height="match_parent"
-        android:layout_gravity="left"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
         android:background="@drawable/bg_sidebar_left"
         tools:ignore="RtlHardcoded" />
 
