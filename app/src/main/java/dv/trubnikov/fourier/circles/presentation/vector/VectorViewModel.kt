@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dv.trubnikov.fourier.circles.calculates.FourierCalculator
 import dv.trubnikov.fourier.circles.calculates.PictureCalculator
 import dv.trubnikov.fourier.circles.models.Complex
+import dv.trubnikov.fourier.circles.presentation.vector.di.VectorComponent
 import dv.trubnikov.fourier.circles.tools.StateSharedFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -23,6 +24,10 @@ class VectorViewModel : ViewModel() {
         private const val MAX_NUMBER_OF_VECTORS = 50
         private const val DEFAULT_NUMBER_OF_VECTORS = 5
         private const val USER_INPUT_SAMPLING_MS = 50L
+    }
+
+    init {
+        VectorComponent.build()
     }
 
     private val userInputVector = MutableSharedFlow<Int>(
@@ -59,6 +64,10 @@ class VectorViewModel : ViewModel() {
 
     fun onVectorCountChanged(number: Int) {
         userInputVector.tryEmit(number)
+    }
+
+    override fun onCleared() {
+        VectorComponent.release()
     }
 
     private suspend fun changeNumberOfVectors(number: Int) {
