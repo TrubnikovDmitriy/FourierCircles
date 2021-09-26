@@ -5,19 +5,18 @@ import android.graphics.Canvas
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.view.View
 import android.view.View.OnClickListener
 import androidx.annotation.CallSuper
 import androidx.core.view.setPadding
 import dv.trubnikov.fourier.circles.R
-import kotlin.math.min
+import dv.trubnikov.fourier.circles.views.SquareView
 
 abstract class IconView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
-) : View(context, attrs, defStyleAttr, defStyleRes) {
+) : SquareView(context, attrs, defStyleAttr, defStyleRes) {
 
     companion object {
         private val disableColorMatrix = ColorMatrixColorFilter(
@@ -55,13 +54,6 @@ abstract class IconView @JvmOverloads constructor(
         val widthScale = (width - paddingLeft - paddingRight).toFloat() / width
         val heightScale = (height - paddingTop - paddingBottom).toFloat() / height
         canvas.scale(widthScale, heightScale, width / 2f, height / 2f)
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val width = getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
-        val height = getDefaultSize(suggestedMinimumHeight, heightMeasureSpec)
-        val size = min(width, height)
-        setMeasuredDimension(size, size)
     }
 
     protected abstract fun onDisableIcon(tunePaint: Paint.() -> Unit)
