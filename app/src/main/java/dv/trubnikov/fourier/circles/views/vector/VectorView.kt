@@ -1,17 +1,15 @@
 package dv.trubnikov.fourier.circles.views.vector
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.LinearInterpolator
 import androidx.core.animation.doOnRepeat
 import androidx.core.graphics.withScale
 import dv.trubnikov.fourier.circles.R
-import dv.trubnikov.fourier.circles.models.Tick
 import dv.trubnikov.fourier.circles.presentation.vector.IconType
 import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
+import dv.trubnikov.fourier.circles.presentation.vector.di.VectorComponent
 import dv.trubnikov.fourier.circles.tools.withMathCoordinates
 import dv.trubnikov.fourier.circles.views.drawers.vectors.*
 import kotlin.math.min
@@ -39,27 +37,17 @@ class VectorView @JvmOverloads constructor(
         .register(ArrowDrawer())
         .build()
 
-    private val animator = ValueAnimator.ofFloat(Tick.MIN_VALUE, Tick.MAX_VALUE).apply {
-        interpolator = LinearInterpolator()
-        repeatMode = ValueAnimator.RESTART
-        repeatCount = ValueAnimator.INFINITE
-        duration = 10_000
-        addUpdateListener { invalidate() }
-        doOnRepeat { drawers.onAnimationRepeat() }
+    private val animator by lazy {
+        VectorComponent.instance.timeController.apply {
+            addUpdateListener { invalidate() }
+            doOnRepeat { drawers.onAnimationRepeat() }
+        }
     }
 
     private val scaleWindow = VectorScaleWindow(context)
 
     private var picture: VectorPicture? = null
     private var vectorCount: Int = 0
-
-    fun resume() {
-        animator.resume()
-    }
-
-    fun pause() {
-        animator.pause()
-    }
 
     fun toggleDrawer(type: IconType, isActive: Boolean) {
         val drawerClass = when (type) {
@@ -97,9 +85,11 @@ class VectorView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas) {
-        val picture = picture ?: return
-        val tick = Tick(animator.animatedValue as Float)
-        val pictureFrame = picture.valueFor(tick)
+        val picture = picture ?: run {
+            drawers.getDrawer<AxisDrawer>()?.onDraw(canvas, emptyList())
+            return
+        }
+        val pictureFrame = picture.valueFor(animator.currentTick)
         val vectors = pictureFrame.vectors.subList(0, vectorCount)
 
         val widthScale = (width - paddingLeft - paddingRight).toFloat() / width

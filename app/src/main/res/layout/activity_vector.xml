@@ -17,21 +17,26 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|top" />
 
-    <FrameLayout
+    <dv.trubnikov.fourier.circles.views.rotate.RotateRecyclerView
         android:id="@+id/sidebar_recycler_right"
         android:layout_width="@dimen/sidebar_width"
-        android:layout_height="match_parent"
-        android:layout_gravity="right"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
         android:background="@drawable/bg_sidebar_right"
-        tools:ignore="RtlHardcoded" />
+        android:requiresFadingEdge="vertical"
+        android:fadingEdgeLength="@dimen/sidebar_width"
+        android:paddingVertical="@dimen/icon_view_padding"
+        tools:ignore="RtlHardcoded"
+        tools:itemCount="50"
+        tools:listitem="@layout/vh_rotate_vector" />
 
     <dv.trubnikov.fourier.circles.presentation.vector.sidebars.LeftSidebar
         android:id="@+id/sidebar_recycler_left"
-        android:paddingVertical="@dimen/icon_view_padding"
         android:layout_width="@dimen/sidebar_width"
         android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
+        android:layout_gravity="left|bottom"
         android:background="@drawable/bg_sidebar_left"
+        android:paddingVertical="@dimen/icon_view_padding"
         tools:ignore="RtlHardcoded" />
 
     <include

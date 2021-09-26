@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.databinding.ActivityVectorBinding
@@ -17,6 +18,8 @@ import dv.trubnikov.fourier.circles.models.Complex
 import dv.trubnikov.fourier.circles.models.getComplex
 import dv.trubnikov.fourier.circles.models.putComplex
 import dv.trubnikov.fourier.circles.presentation.draw.DrawActivity
+import dv.trubnikov.fourier.circles.presentation.vector.di.VectorComponent
+import dv.trubnikov.fourier.circles.tools.updateMargins
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -34,6 +37,7 @@ class VectorActivity : ComponentActivity() {
 
     private lateinit var binding: ActivityVectorBinding
     private val viewModel by viewModels<VectorViewModel>()
+    private val timeController by lazy { VectorComponent.instance.timeController }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,12 +76,12 @@ class VectorActivity : ComponentActivity() {
             finish()
         }
         binding.controls.playButton.setOnClickListener {
-            binding.vectorView.resume()
+            timeController.resume()
             binding.controls.playButton.isVisible = false
             binding.controls.pauseButton.isVisible = true
         }
         binding.controls.pauseButton.setOnClickListener {
-            binding.vectorView.pause()
+            timeController.pause()
             binding.controls.playButton.isVisible = true
             binding.controls.pauseButton.isVisible = false
         }
@@ -92,6 +96,17 @@ class VectorActivity : ComponentActivity() {
         }
         binding.sidebarRecyclerLeft.setOnIconClickListener { icon, isActive ->
             binding.vectorView.toggleDrawer(icon, isActive)
+        }
+        binding.sidebarRecyclerRight.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            lifecycleScope.launchWhenCreated {
+                viewModel.pictureFlow.collect { picture ->
+                    setVectors(picture) { position, isActive ->
+                        adapter?.apply { setVectorState(position, !isActive) }
+                    }
+                    adapter?.setVectorCount(viewModel.vectorsNumberFlow.value)
+                }
+            }
         }
         val scaleListener = ScaleGestureListener(this) {
             binding.vectorView.setScaleFactor(it)
@@ -109,6 +124,7 @@ class VectorActivity : ComponentActivity() {
             viewModel.vectorsNumberFlow.collect {
                 binding.bottomSheet.vectorCountText.text = it.toString()
                 binding.vectorView.setVectorCount(it)
+                binding.sidebarRecyclerRight.adapter?.setVectorCount(it)
             }
         }
         binding.bottomSheet.vectorCountSeekbar.progress = viewModel.vectorsNumberFlow.value
@@ -145,10 +161,17 @@ class VectorActivity : ComponentActivity() {
             binding.controls.root.apply {
                 translationX = -binding.sidebarRecyclerRight.width * slideOffset
             }
+            val bottomSheetHeight = binding.root.height - binding.bottomSheet.root.top
             binding.vectorView.updatePadding(
                 left = (binding.sidebarRecyclerLeft.width * slideOffset).toInt(),
                 right = (binding.sidebarRecyclerRight.width * slideOffset).toInt(),
-                bottom = (binding.root.height - binding.bottomSheet.root.top)
+                bottom = bottomSheetHeight
+            )
+            binding.sidebarRecyclerRight.updateMargins(
+                bottom = bottomSheetHeight
+            )
+            binding.sidebarRecyclerLeft.updateMargins(
+                bottom = bottomSheetHeight
             )
         }
     }
