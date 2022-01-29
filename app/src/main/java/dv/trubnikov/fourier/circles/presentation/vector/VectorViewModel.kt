@@ -1,5 +1,6 @@
 package dv.trubnikov.fourier.circles.presentation.vector
 
+import androidx.annotation.FloatRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dv.trubnikov.fourier.circles.calculates.FourierCalculator
@@ -30,12 +31,14 @@ class VectorViewModel : ViewModel() {
         VectorComponent.build()
     }
 
+    private val timeController by lazy { VectorComponent.instance.timeController }
     private val userInputVector = MutableSharedFlow<Int>(
         replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
     val pictureFlow = StateSharedFlow<VectorPicture>()
     val vectorsNumberFlow = MutableStateFlow(DEFAULT_NUMBER_OF_VECTORS)
+    val vectorsSpeedFlow = MutableStateFlow(1.0f)
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
@@ -64,6 +67,14 @@ class VectorViewModel : ViewModel() {
 
     fun onVectorCountChanged(number: Int) {
         userInputVector.tryEmit(number)
+    }
+
+    fun onVectorSpeedChanged(@FloatRange(from = 0.0, to = 1.0) progress: Float) {
+        val x = progress.coerceIn(0.0f, 1.0f)
+        // Transform from [0;1] to [0.1;1]
+        val speed = (9 * x + 1) / 10
+        timeController.duration = (10_000 / speed).toLong()
+        vectorsSpeedFlow.value = speed
     }
 
     override fun onCleared() {

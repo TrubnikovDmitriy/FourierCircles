@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Fourier Circles</string>
+    <string name="vector_speed">x%.1f</string>
 </resources>

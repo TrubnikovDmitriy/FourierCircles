@@ -67,6 +67,18 @@ class VectorActivity : ComponentActivity() {
                 }
             }
         )
+        binding.bottomSheet.vectorSpeedSeekbar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onStopTrackingTouch(seekBar: SeekBar) = Unit
+                override fun onStartTrackingTouch(seekBar: SeekBar) = Unit
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    if (fromUser) {
+                        val percent = progress.toFloat() / binding.bottomSheet.vectorSpeedSeekbar.max
+                        viewModel.onVectorSpeedChanged(percent)
+                    }
+                }
+            }
+        )
         binding.controls.deleteButton.setOnClickListener {
             val behaviour = BottomSheetBehavior.from(binding.bottomSheet.root)
             behaviour.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -125,6 +137,11 @@ class VectorActivity : ComponentActivity() {
                 binding.bottomSheet.vectorCountText.text = it.toString()
                 binding.vectorView.setVectorCount(it)
                 binding.sidebarRecyclerRight.adapter?.setVectorCount(it)
+            }
+        }
+        lifecycleScope.launchWhenResumed {
+            viewModel.vectorsSpeedFlow.collect {
+                binding.bottomSheet.vectorSpeedText.text = getString(R.string.vector_speed, it)
             }
         }
         binding.bottomSheet.vectorCountSeekbar.progress = viewModel.vectorsNumberFlow.value

@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.view.animation.LinearInterpolator
 import dv.trubnikov.fourier.circles.models.Tick
 
-@Suppress("Recycle")
 class TimeController : ValueAnimator() {
 
     init {

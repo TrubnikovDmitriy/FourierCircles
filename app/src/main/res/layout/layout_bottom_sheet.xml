@@ -27,7 +27,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/vector_count_seekbar"
         tools:ignore="RtlSymmetry"
-        tools:text="142" />
+        tools:text="42" />
 
     <androidx.appcompat.widget.AppCompatSeekBar
         android:id="@+id/vector_count_seekbar"
@@ -35,8 +35,38 @@
         android:layout_height="40dp"
         android:max="100"
         android:progressBackgroundTint="@color/vector_color"
+        app:layout_constraintTop_toTopOf="parent"
         android:progressTint="@color/vector_color"
         android:thumbTint="@color/vector_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/vector_count_text" />
+
+    <TextView
+        android:id="@+id/vector_speed_text"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:gravity="end"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxLines="1"
+        android:textColor="@color/vector_color"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@id/vector_speed_seekbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/vector_speed_seekbar"
+        tools:ignore="RtlSymmetry"
+        tools:text="x1.0" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/vector_speed_seekbar"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:progress="100"
+        android:max="100"
+        android:progressBackgroundTint="@color/vector_color"
+        android:progressTint="@color/vector_color"
+        android:thumbTint="@color/vector_color"
+        app:layout_constraintTop_toBottomOf="@id/vector_count_seekbar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/vector_count_text" />
