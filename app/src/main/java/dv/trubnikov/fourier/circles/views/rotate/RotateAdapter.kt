@@ -14,9 +14,9 @@ class RotateAdapter(
     private val vectorEnables = BooleanArray(vectorPicture.size) { true }
     private var count = 0
 
-    fun setVectorState(position: Int, isActive: Boolean) {
-        vectorEnables[position] = isActive
-        notifyItemChanged(position)
+    fun setVectorState(index: Int, isActive: Boolean) {
+        vectorEnables[index] = isActive
+        notifyItemChanged(index)
     }
 
     fun setVectorCount(newCount: Int) {
@@ -35,7 +35,7 @@ class RotateAdapter(
     }
 
     override fun onBindViewHolder(holder: RotateViewHolder, position: Int) {
-        holder.setVectorNumber(position, vectorEnables[position])
+        holder.bindVectorIndex(position, vectorEnables[position])
     }
 
     override fun getItemCount(): Int {

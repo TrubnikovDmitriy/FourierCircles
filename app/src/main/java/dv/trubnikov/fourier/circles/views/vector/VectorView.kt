@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.ColorInt
 import androidx.core.animation.doOnRepeat
 import androidx.core.graphics.withScale
 import dv.trubnikov.fourier.circles.R
@@ -48,6 +49,11 @@ class VectorView @JvmOverloads constructor(
 
     private var picture: VectorPicture? = null
     private var vectorCount: Int = 0
+
+    fun setVectorColor(vectorIndex: Int, @ColorInt color: Int) {
+        drawers.getDrawer<ArrowDrawer>()?.setVectorColor(vectorIndex, color)
+        postInvalidate()
+    }
 
     fun toggleDrawer(type: IconType, isActive: Boolean) {
         val drawerClass = when (type) {

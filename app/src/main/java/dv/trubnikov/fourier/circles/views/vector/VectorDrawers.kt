@@ -56,10 +56,7 @@ class VectorDrawers(
     }
 
     fun <D : CanvasDrawer> getDrawer(klass: KClass<D>): D? {
-        if (drawerMap.containsKey(klass)) {
-            return null
-        }
         @Suppress("UNCHECKED_CAST")
-        return drawerMap.getValue(klass) as D
+        return drawerMap[klass] as D?
     }
 }

@@ -113,8 +113,14 @@ class VectorActivity : ComponentActivity() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             lifecycleScope.launchWhenCreated {
                 viewModel.pictureFlow.collect { picture ->
-                    setVectors(picture) { position, isActive ->
-                        adapter?.apply { setVectorState(position, !isActive) }
+                    setVectors(picture) { index, isActive ->
+                        adapter?.apply { setVectorState(index, !isActive) }
+                        val color = if (!isActive) {
+                            R.color.vector_color
+                        } else {
+                            R.color.vector_color_disabled
+                        }
+                        binding.vectorView.setVectorColor(index, getColor(color))
                     }
                     adapter?.setVectorCount(viewModel.vectorsNumberFlow.value)
                 }
