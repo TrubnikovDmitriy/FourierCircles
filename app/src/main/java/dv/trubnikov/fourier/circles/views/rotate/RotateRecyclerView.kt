@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
+import dv.trubnikov.fourier.circles.models.Picture
 
 class RotateRecyclerView @JvmOverloads constructor(
     context: Context,
@@ -19,7 +19,7 @@ class RotateRecyclerView @JvmOverloads constructor(
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     }
 
-    fun setVectors(picture: VectorPicture, listener: RotateClickListener) {
+    fun setVectors(picture: Picture, listener: RotateClickListener) {
         adapter = RotateAdapter(picture, listener)
         setAdapter(adapter)
     }

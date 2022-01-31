@@ -9,7 +9,7 @@ import androidx.core.animation.doOnRepeat
 import androidx.core.graphics.withScale
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.presentation.vector.IconType
-import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
+import dv.trubnikov.fourier.circles.models.Picture
 import dv.trubnikov.fourier.circles.presentation.vector.di.VectorComponent
 import dv.trubnikov.fourier.circles.tools.withMathCoordinates
 import dv.trubnikov.fourier.circles.views.drawers.vectors.*
@@ -47,7 +47,7 @@ class VectorView @JvmOverloads constructor(
 
     private val scaleWindow = VectorScaleWindow(context)
 
-    private var picture: VectorPicture? = null
+    private var picture: Picture? = null
     private var vectorCount: Int = 0
 
     fun setVectorColor(vectorIndex: Int, @ColorInt color: Int) {
@@ -71,7 +71,7 @@ class VectorView @JvmOverloads constructor(
         postInvalidate()
     }
 
-    fun setPicture(picture: VectorPicture) {
+    fun setPicture(picture: Picture) {
         post {
             this.picture = picture
             drawers.onPictureUpdate(picture)

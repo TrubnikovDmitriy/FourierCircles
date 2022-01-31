@@ -4,14 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import dv.trubnikov.fourier.circles.R
-import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
+import dv.trubnikov.fourier.circles.models.Picture
 
 class RotateAdapter(
-    private val vectorPicture: VectorPicture,
+    private val picture: Picture,
     private val clickListener: RotateClickListener,
 ) : RecyclerView.Adapter<RotateViewHolder>() {
 
-    private val vectorEnables = BooleanArray(vectorPicture.size) { true }
+    private val vectorEnables = BooleanArray(picture.size) { true }
     private var count = 0
 
     fun setVectorState(index: Int, isActive: Boolean) {
@@ -31,7 +31,7 @@ class RotateAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RotateViewHolder {
         val rotateView = LayoutInflater.from(parent.context).inflate(R.layout.vh_rotate_vector, parent, false)
-        return RotateViewHolder(rotateView as RotateView, vectorPicture, clickListener)
+        return RotateViewHolder(rotateView as RotateView, picture, clickListener)
     }
 
     override fun onBindViewHolder(holder: RotateViewHolder, position: Int) {

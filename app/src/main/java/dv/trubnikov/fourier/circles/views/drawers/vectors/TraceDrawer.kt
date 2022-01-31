@@ -4,7 +4,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import dv.trubnikov.fourier.circles.models.FourierVector
-import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
+import dv.trubnikov.fourier.circles.models.Picture
 import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
 
 class TraceDrawer : CanvasDrawer {
@@ -14,7 +14,7 @@ class TraceDrawer : CanvasDrawer {
     }
 
     private var isRepeating = false
-    private var picture: VectorPicture? = null
+    private var picture: Picture? = null
 
     private val trace = ArrayList<FourierVector>()
     private val tracePaint = Paint().apply {
@@ -25,7 +25,7 @@ class TraceDrawer : CanvasDrawer {
         style = Paint.Style.STROKE
     }
 
-    override fun onPictureUpdate(picture: VectorPicture) {
+    override fun onPictureUpdate(picture: Picture) {
         this.picture = picture
         isRepeating = false
         trace.clear()

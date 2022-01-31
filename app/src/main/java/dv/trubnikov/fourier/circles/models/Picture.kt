@@ -1,12 +1,9 @@
-package dv.trubnikov.fourier.circles.presentation.vector
+package dv.trubnikov.fourier.circles.models
 
 import dv.trubnikov.fourier.circles.calculates.searchers.BinarySearcher
 import dv.trubnikov.fourier.circles.calculates.searchers.ValueSearcher
-import dv.trubnikov.fourier.circles.models.Complex
-import dv.trubnikov.fourier.circles.models.PictureFrame
-import dv.trubnikov.fourier.circles.models.Tick
 
-class VectorPicture(
+class Picture(
     val originalPath: List<Complex>,
     pictureFrames: List<PictureFrame>
 ) : ValueSearcher<Tick, PictureFrame> {

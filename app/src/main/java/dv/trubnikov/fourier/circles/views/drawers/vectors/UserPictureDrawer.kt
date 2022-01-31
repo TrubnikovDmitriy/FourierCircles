@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import dv.trubnikov.fourier.circles.R
 import dv.trubnikov.fourier.circles.models.FourierVector
-import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
+import dv.trubnikov.fourier.circles.models.Picture
 import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
 
 class UserPictureDrawer(context: Context) : CanvasDrawer {
@@ -21,7 +21,7 @@ class UserPictureDrawer(context: Context) : CanvasDrawer {
         pathEffect = DashPathEffect(floatArrayOf(10f, 20f), 0f)
     }
 
-    override fun onPictureUpdate(picture: VectorPicture) {
+    override fun onPictureUpdate(picture: Picture) {
         userPicture.reset()
         for (index in picture.originalPath.indices) {
             val point = picture.originalPath[index]

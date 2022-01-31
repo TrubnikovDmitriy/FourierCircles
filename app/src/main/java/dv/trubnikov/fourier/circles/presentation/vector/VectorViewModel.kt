@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dv.trubnikov.fourier.circles.calculates.FourierCalculator
 import dv.trubnikov.fourier.circles.calculates.PictureCalculator
 import dv.trubnikov.fourier.circles.models.Complex
+import dv.trubnikov.fourier.circles.models.Picture
 import dv.trubnikov.fourier.circles.presentation.vector.di.VectorComponent
 import dv.trubnikov.fourier.circles.tools.StateSharedFlow
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,7 @@ class VectorViewModel : ViewModel() {
         replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    val pictureFlow = StateSharedFlow<VectorPicture>()
+    val pictureFlow = StateSharedFlow<Picture>()
     val vectorsNumberFlow = MutableStateFlow(DEFAULT_NUMBER_OF_VECTORS)
     val vectorsSpeedFlow = MutableStateFlow(1.0f)
 
@@ -60,7 +61,7 @@ class VectorViewModel : ViewModel() {
             }
             val pictureCalculator = PictureCalculator(fourierCalculator)
             val pictureFrames = pictureCalculator.calculatePicture(MAX_NUMBER_OF_VECTORS)
-            val vectorPicture = VectorPicture(userPath, pictureFrames)
+            val vectorPicture = Picture(userPath, pictureFrames)
             pictureFlow.emit(vectorPicture)
         }
     }

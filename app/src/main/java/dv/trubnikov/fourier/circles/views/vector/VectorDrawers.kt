@@ -2,7 +2,7 @@ package dv.trubnikov.fourier.circles.views.vector
 
 import android.graphics.Canvas
 import dv.trubnikov.fourier.circles.models.FourierVector
-import dv.trubnikov.fourier.circles.presentation.vector.VectorPicture
+import dv.trubnikov.fourier.circles.models.Picture
 import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
 import kotlin.reflect.KClass
 
@@ -39,7 +39,7 @@ class VectorDrawers(
         drawerMap.onEach { it.value.onAnimationRepeat() }
     }
 
-    override fun onPictureUpdate(picture: VectorPicture) {
+    override fun onPictureUpdate(picture: Picture) {
         drawerMap.onEach { it.value.onPictureUpdate(picture) }
     }
 
