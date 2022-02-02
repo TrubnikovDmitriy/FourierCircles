@@ -3,6 +3,7 @@ package dv.trubnikov.fourier.circles.views.drawers.vectors
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import dv.trubnikov.fourier.circles.calculates.TraceCalculator
 import dv.trubnikov.fourier.circles.models.FourierVector
 import dv.trubnikov.fourier.circles.models.Picture
 import dv.trubnikov.fourier.circles.views.drawers.CanvasDrawer
@@ -15,7 +16,9 @@ class TraceDrawer : CanvasDrawer {
 
     private var isRepeating = false
     private var picture: Picture? = null
+    private var vectorSize = 0
 
+    private val traceCalculator = TraceCalculator()
     private val trace = ArrayList<FourierVector>()
     private val tracePaint = Paint().apply {
         color = Color.RED
@@ -32,12 +35,7 @@ class TraceDrawer : CanvasDrawer {
     }
 
     override fun onDraw(canvas: Canvas, vectors: List<FourierVector>) {
-        trace.add(vectors.last())
-
-        if (isRepeating && trace.isNotEmpty()) {
-            trace.removeFirst()
-        }
-
+        val trace = traceCalculator.calculateTrace(picture ?: return, vectorSize, 100)
         drawTrace(canvas, trace)
     }
 
